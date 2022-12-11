@@ -17,3 +17,6 @@ const TEXT_BIG = 32.0;
 
 /// App Specific
 const TEXT_13 = 13.0;
+const TEXT_15 = 15.0;
+
+const MARGIN_40 = 40.0;

@@ -1,3 +1,4 @@
+import 'package:empress_ecommerce_app/pages/order_history_page.dart';
 import 'package:empress_ecommerce_app/resources/colors.dart';
 import 'package:empress_ecommerce_app/resources/dimens.dart';
 import 'package:empress_ecommerce_app/widgets/label_and_text_field_view.dart';
@@ -62,12 +63,12 @@ class EditProfileSectionView extends StatelessWidget {
         ProductListTitleView(title: "Edit Account"),
         SizedBox(height: MARGIN_MEDIUM_2),
         Container(
-          padding: EdgeInsets.symmetric(horizontal: MARGIN_CARD_MEDIUM_2, vertical: MARGIN_CARD_MEDIUM_2),
+          padding: EdgeInsets.symmetric(
+              horizontal: MARGIN_CARD_MEDIUM_2, vertical: MARGIN_CARD_MEDIUM_2),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(MARGIN_MEDIUM),
-            border: Border.all(color: BORDER_COLOR)
-          ),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(MARGIN_MEDIUM),
+              border: Border.all(color: BORDER_COLOR)),
           child: Column(
             children: [
               LabelAndTextFieldView(label: "Name", hintText: "Maung Maung"),
@@ -164,7 +165,9 @@ class ProfileSectionView extends StatelessWidget {
               ),
               SizedBox(height: MARGIN_MEDIUM),
               MaterialButton(
-                onPressed: () {},
+                onPressed: () {
+                  _navigateToOrderHistoryPage(context);
+                },
                 color: ORDER_BUTTON_COLOR,
                 padding: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM),
                 elevation: 0,
@@ -182,6 +185,15 @@ class ProfileSectionView extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  void _navigateToOrderHistoryPage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => OrderHistoryPage(),
       ),
     );
   }

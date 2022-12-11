@@ -3,11 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class RatingView extends StatelessWidget {
+
+  final double rating;
+
+
+  RatingView({this.rating = 4.0});
+
   @override
   Widget build(BuildContext context) {
     return RatingBar.builder(
       ignoreGestures: true,
-      initialRating: 4.0,
+      initialRating: rating,
       itemBuilder: (context, index) {
         return Icon(
           Icons.star,

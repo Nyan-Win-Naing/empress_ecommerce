@@ -6,11 +6,13 @@ class LabelAndTextFieldView extends StatefulWidget {
   final String label;
   final String hintText;
   final bool isPasswordField;
+  final bool isSignIn;
 
   LabelAndTextFieldView({
     required this.label,
     required this.hintText,
     this.isPasswordField = false,
+    this.isSignIn = false,
   });
 
   @override
@@ -29,11 +31,15 @@ class _LabelAndTextFieldViewState extends State<LabelAndTextFieldView> {
           widget.label,
           style: TextStyle(
             fontSize: TEXT_REGULAR_2X,
+            color: widget.isSignIn ? Colors.white : Colors.black,
           ),
         ),
         SizedBox(height: MARGIN_MEDIUM),
         TextField(
           obscureText: widget.isPasswordField ? isHidePassword : false,
+          style: TextStyle(
+            color: widget.isSignIn ? Colors.white : Colors.black,
+          ),
           decoration: InputDecoration(
               enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(width: 1, color: BORDER_COLOR),
@@ -51,6 +57,7 @@ class _LabelAndTextFieldViewState extends State<LabelAndTextFieldView> {
                 },
                 icon: Icon(
                   isHidePassword ? Icons.remove_red_eye : Icons.password,
+                  color: widget.isSignIn ? Colors.white : Colors.black,
                 ),
               ) : null,
               hintText: widget.hintText,

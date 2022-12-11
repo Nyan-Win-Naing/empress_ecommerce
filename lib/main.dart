@@ -1,4 +1,5 @@
 import 'package:empress_ecommerce_app/pages/empress_app.dart';
+import 'package:empress_ecommerce_app/pages/log_in_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -17,7 +18,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: EmpressApp(),
+      // home: EmpressApp(),
+      home: LogInPage(),
     );
   }
 }
