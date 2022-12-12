@@ -1,9 +1,16 @@
+import 'package:empress_ecommerce_app/data/vos/item_vo.dart';
 import 'package:empress_ecommerce_app/pages/product_detail_page.dart';
 import 'package:empress_ecommerce_app/resources/colors.dart';
 import 'package:empress_ecommerce_app/resources/dimens.dart';
 import 'package:flutter/material.dart';
 
 class ProductView extends StatelessWidget {
+
+  final ItemVO? item;
+
+
+  ProductView({required this.item});
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -21,10 +28,10 @@ class ProductView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ProductImageView(),
+            ProductImageView(image: item?.image ?? "https://media.istockphoto.com/id/1147544807/vector/thumbnail-image-vector-graphic.jpg?s=612x612&w=0&k=20&c=rnCKVbdxqkjlcs3xH87-9gocETqpspHFXu5dIGB4wuM="),
             SizedBox(height: MARGIN_MEDIUM),
             Text(
-              "Logitech G240",
+              item?.name ?? "",
               style: TextStyle(
                 fontSize: TEXT_REGULAR_2X,
                 fontWeight: FontWeight.bold,
@@ -32,11 +39,11 @@ class ProductView extends StatelessWidget {
             ),
             SizedBox(height: MARGIN_SMALL),
             Text(
-              "Logitech G",
+              item?.brand ?? "",
             ),
             SizedBox(height: MARGIN_SMALL),
             Text(
-              "\$ 9.99",
+              "\$ ${item?.price}",
               style: TextStyle(
                 fontWeight: FontWeight.w600,
               ),
@@ -49,9 +56,11 @@ class ProductView extends StatelessWidget {
 }
 
 class ProductImageView extends StatelessWidget {
-  const ProductImageView({
-    Key? key,
-  }) : super(key: key);
+
+  final String image;
+
+
+  ProductImageView({required this.image});
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +75,7 @@ class ProductImageView extends StatelessWidget {
         children: [
           Positioned.fill(
             child: Image.network(
-              "https://res.cloudinary.com/dqscrfky2/image/upload/v1666593361/u5vmwuhm00kagvkarmme.png",
+              image,
             ),
           ),
           Align(

@@ -1,50 +1,87 @@
+import 'package:empress_ecommerce_app/blocs/profile_bloc.dart';
+import 'package:empress_ecommerce_app/data/vos/user_vo.dart';
+import 'package:empress_ecommerce_app/pages/log_in_page.dart';
 import 'package:empress_ecommerce_app/pages/order_history_page.dart';
 import 'package:empress_ecommerce_app/resources/colors.dart';
 import 'package:empress_ecommerce_app/resources/dimens.dart';
 import 'package:empress_ecommerce_app/widgets/label_and_text_field_view.dart';
 import 'package:empress_ecommerce_app/widgets/product_list_title_view.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        title: Text(
-          "Account Info",
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: MARGIN_MEDIUM),
-            child: Icon(
-              Icons.logout,
-              color: Colors.redAccent,
+    return ChangeNotifierProvider(
+      create: (context) => ProfileBloc(),
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          centerTitle: true,
+          title: Text(
+            "Account Info",
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w700,
             ),
           ),
-        ],
-      ),
-      body: Container(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: MARGIN_MEDIUM_3),
-              ProfileSectionView(),
-              SizedBox(height: MARGIN_XXLARGE),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
-                child: EditProfileSectionView(),
-              ),
-            ],
+          actions: [
+            Padding(
+              padding: EdgeInsets.only(right: MARGIN_MEDIUM),
+              child: Builder(builder: (context) {
+                return GestureDetector(
+                  onTap: () {
+                    ProfileBloc bloc =
+                        Provider.of<ProfileBloc>(context, listen: false);
+                    bloc.onTapLogout().then((value) {
+                      _navigateToLoginPage(context);
+                    }).catchError((error) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Log out fail !"),
+                        ),
+                      );
+                    });
+                  },
+                  child: Icon(
+                    Icons.logout,
+                    color: Colors.redAccent,
+                  ),
+                );
+              }),
+            ),
+          ],
+        ),
+        body: Container(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: MARGIN_MEDIUM_3),
+                Selector<ProfileBloc, UserVO?>(
+                  selector: (context, bloc) => bloc.loggedInUser,
+                  builder: (context, loggedInUser, child) =>
+                      ProfileSectionView(userVo: loggedInUser),
+                ),
+                SizedBox(height: MARGIN_XXLARGE),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
+                  child: EditProfileSectionView(),
+                ),
+              ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  void _navigateToLoginPage(BuildContext context) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LogInPage(),
       ),
     );
   }
@@ -71,15 +108,23 @@ class EditProfileSectionView extends StatelessWidget {
               border: Border.all(color: BORDER_COLOR)),
           child: Column(
             children: [
-              LabelAndTextFieldView(label: "Name", hintText: "Maung Maung"),
+              LabelAndTextFieldView(
+                label: "Name",
+                hintText: "Maung Maung",
+                onChanged: (value) {},
+              ),
               SizedBox(height: MARGIN_LARGE),
               LabelAndTextFieldView(
-                  label: "Email", hintText: "maungmaung123@gmail.com"),
+                label: "Email",
+                hintText: "maungmaung123@gmail.com",
+                onChanged: (value) {},
+              ),
               SizedBox(height: MARGIN_LARGE),
               LabelAndTextFieldView(
                 label: "Password",
                 hintText: "Please enter your update password",
                 isPasswordField: true,
+                onChanged: (value) {},
               ),
               SizedBox(height: MARGIN_LARGE),
               EditButtonView(),
@@ -118,6 +163,10 @@ class EditButtonView extends StatelessWidget {
 }
 
 class ProfileSectionView extends StatelessWidget {
+  final UserVO? userVo;
+
+  ProfileSectionView({required this.userVo});
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -148,7 +197,7 @@ class ProfileSectionView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Maung Maung",
+                userVo?.name ?? "",
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
                   fontSize: TEXT_REGULAR_2X,
@@ -157,7 +206,7 @@ class ProfileSectionView extends StatelessWidget {
               ),
               SizedBox(height: MARGIN_MEDIUM),
               Text(
-                "maungmaung123@gmail.com",
+                userVo?.email ?? "",
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
                   color: Color.fromRGBO(0, 0, 0, 0.4),

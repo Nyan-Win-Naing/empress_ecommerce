@@ -7,10 +7,12 @@ class LabelAndTextFieldView extends StatefulWidget {
   final String hintText;
   final bool isPasswordField;
   final bool isSignIn;
+  final Function(String) onChanged;
 
   LabelAndTextFieldView({
     required this.label,
     required this.hintText,
+    required this.onChanged,
     this.isPasswordField = false,
     this.isSignIn = false,
   });
@@ -36,6 +38,9 @@ class _LabelAndTextFieldViewState extends State<LabelAndTextFieldView> {
         ),
         SizedBox(height: MARGIN_MEDIUM),
         TextField(
+          onChanged: (value) {
+            widget.onChanged(value);
+          },
           obscureText: widget.isPasswordField ? isHidePassword : false,
           style: TextStyle(
             color: widget.isSignIn ? Colors.white : Colors.black,

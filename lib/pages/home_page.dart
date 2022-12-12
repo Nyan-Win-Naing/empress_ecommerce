@@ -1,4 +1,6 @@
 import 'package:dots_indicator/dots_indicator.dart';
+import 'package:empress_ecommerce_app/blocs/home_bloc.dart';
+import 'package:empress_ecommerce_app/data/vos/item_vo.dart';
 import 'package:empress_ecommerce_app/dummy/dummy_list.dart';
 import 'package:empress_ecommerce_app/resources/colors.dart';
 import 'package:empress_ecommerce_app/resources/dimens.dart';
@@ -6,50 +8,60 @@ import 'package:empress_ecommerce_app/viewitems/banner_view.dart';
 import 'package:empress_ecommerce_app/viewitems/product_view.dart';
 import 'package:empress_ecommerce_app/widgets/product_list_title_view.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        title: Text(
-          "Empress",
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        leading: Icon(
-          Icons.menu,
-          color: Colors.black,
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: MARGIN_MEDIUM),
-            child: Icon(
-              Icons.search,
+    return ChangeNotifierProvider(
+      create: (context) => HomeBloc(),
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          centerTitle: true,
+          title: Text(
+            "Empress",
+            style: TextStyle(
               color: Colors.black,
+              fontWeight: FontWeight.w700,
             ),
           ),
-        ],
-      ),
-      body: Container(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              BannerSectionView(),
-              SizedBox(height: MARGIN_MEDIUM_2),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
-                child: OurServiceSectionView(),
+          leading: Icon(
+            Icons.menu,
+            color: Colors.black,
+          ),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: MARGIN_MEDIUM),
+              child: Icon(
+                Icons.search,
+                color: Colors.black,
               ),
-              SizedBox(height: MARGIN_MEDIUM_2),
-              TitleAndHorizontalProductsSectionView(),
-            ],
+            ),
+          ],
+        ),
+        body: Container(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                BannerSectionView(),
+                SizedBox(height: MARGIN_MEDIUM_2),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
+                  child: OurServiceSectionView(),
+                ),
+                SizedBox(height: MARGIN_MEDIUM_2),
+                Selector<HomeBloc, List<ItemVO>>(
+                  selector: (context, bloc) => bloc.newArrivalItems ?? [],
+                  builder: (context, newArrivalItems, child) =>
+                      TitleAndHorizontalProductsSectionView(
+                    newArrivalItems: newArrivalItems,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -58,9 +70,9 @@ class HomePage extends StatelessWidget {
 }
 
 class TitleAndHorizontalProductsSectionView extends StatelessWidget {
-  const TitleAndHorizontalProductsSectionView({
-    Key? key,
-  }) : super(key: key);
+  final List<ItemVO> newArrivalItems;
+
+  TitleAndHorizontalProductsSectionView({required this.newArrivalItems});
 
   @override
   Widget build(BuildContext context) {
@@ -72,16 +84,18 @@ class TitleAndHorizontalProductsSectionView extends StatelessWidget {
           child: ProductListTitleView(title: "New Arrivals"),
         ),
         SizedBox(height: MARGIN_MEDIUM_2),
-        HorizontalProductListView(),
+        HorizontalProductListView(newArrivalItems: newArrivalItems),
       ],
     );
   }
 }
 
 class HorizontalProductListView extends StatelessWidget {
-  const HorizontalProductListView({
-    Key? key,
-  }) : super(key: key);
+
+  final List<ItemVO> newArrivalItems;
+
+
+  HorizontalProductListView({required this.newArrivalItems});
 
   @override
   Widget build(BuildContext context) {
@@ -90,9 +104,9 @@ class HorizontalProductListView extends StatelessWidget {
       child: ListView.builder(
         padding: EdgeInsets.only(left: MARGIN_MEDIUM_2),
         scrollDirection: Axis.horizontal,
-        itemCount: 10,
+        itemCount: newArrivalItems.length,
         itemBuilder: (context, index) {
-          return ProductView();
+          return ProductView(item: newArrivalItems[index]);
         },
       ),
     );

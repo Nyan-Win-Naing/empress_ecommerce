@@ -250,7 +250,16 @@ class _PaymentSectionViewState extends State<PaymentSectionView> {
         ),
         SizedBox(height: MARGIN_MEDIUM_2),
         RadioListTile(
-          title: Text("Paypal"),
+          title: Row(
+            children: [
+              Image.asset(
+                "assets/paypal_logo_trans.png",
+                width: 30,
+              ),
+              SizedBox(width: MARGIN_MEDIUM),
+              Text("Paypal"),
+            ],
+          ),
           value: "paypal",
           groupValue: payment,
           onChanged: (value) {
@@ -260,7 +269,16 @@ class _PaymentSectionViewState extends State<PaymentSectionView> {
           },
         ),
         RadioListTile(
-          title: Text("Stripe"),
+          title: Row(
+            children: [
+              Image.asset(
+                "assets/stripe_logo.png",
+                width: 30,
+              ),
+              SizedBox(width: MARGIN_MEDIUM),
+              Text("Stripe"),
+            ],
+          ),
           value: "stripe",
           groupValue: payment,
           onChanged: (value) {
@@ -286,21 +304,25 @@ class DeliveryAddressSectionView extends StatelessWidget {
         LabelAndTextFieldView(
           label: "Full Name",
           hintText: "Enter your full name",
+          onChanged: (value) {},
         ),
         SizedBox(height: MARGIN_LARGE),
         LabelAndTextFieldView(
           label: "State",
           hintText: "Enter your living state",
+          onChanged: (value) {},
         ),
         SizedBox(height: MARGIN_LARGE),
         LabelAndTextFieldView(
           label: "City",
           hintText: "Enter city",
+          onChanged: (value) {},
         ),
         SizedBox(height: MARGIN_LARGE),
         LabelAndTextFieldView(
           label: "Address",
           hintText: "Enter your full address",
+          onChanged: (value) {},
         ),
       ],
     );

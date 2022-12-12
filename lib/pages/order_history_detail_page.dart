@@ -56,6 +56,7 @@ class OrderHistoryDetailPage extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
                 child: OrderDeliverySectionView(),
               ),
+              SizedBox(height: MARGIN_LARGE),
             ],
           ),
         ),
