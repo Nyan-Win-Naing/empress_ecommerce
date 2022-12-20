@@ -1,3 +1,7 @@
+import 'package:empress_ecommerce_app/blocs/home_bloc.dart';
+import 'package:empress_ecommerce_app/blocs/product_detail_bloc.dart';
+import 'package:empress_ecommerce_app/data/vos/item_vo.dart';
+import 'package:empress_ecommerce_app/data/vos/review_vo.dart';
 import 'package:empress_ecommerce_app/dummy/dummy_list.dart';
 import 'package:empress_ecommerce_app/resources/colors.dart';
 import 'package:empress_ecommerce_app/resources/dimens.dart';
@@ -7,64 +11,89 @@ import 'package:empress_ecommerce_app/widgets/product_list_title_view.dart';
 import 'package:empress_ecommerce_app/widgets/rating_and_comment_view.dart';
 import 'package:empress_ecommerce_app/widgets/rating_view.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ProductDetailPage extends StatelessWidget {
+  final String itemId;
+
+  ProductDetailPage({required this.itemId});
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        title: Text(
-          "Logitech G240",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700),
-        ),
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Icon(
-            Icons.arrow_back_ios,
-            color: Colors.black,
+    return ChangeNotifierProvider(
+      create: (context) => ProductDetailBloc(itemId),
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          centerTitle: true,
+          title: Selector<ProductDetailBloc, ItemVO?>(
+            selector: (context, bloc) => bloc.item,
+            builder: (context, item, child) => Text(
+              item?.name ?? "",
+              style:
+              TextStyle(color: Colors.black, fontWeight: FontWeight.w700),
+            ),
           ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: MARGIN_MEDIUM),
+          leading: GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
             child: Icon(
-              Icons.add_shopping_cart,
+              Icons.arrow_back_ios,
               color: Colors.black,
             ),
           ),
-        ],
-      ),
-      body: Container(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(
-                  top: MARGIN_MEDIUM_3,
-                  left: MARGIN_MEDIUM_2,
-                  right: MARGIN_MEDIUM_2,
-                ),
-                child: ProductImageAndNameSectionView(),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: MARGIN_MEDIUM),
+              child: Icon(
+                Icons.add_shopping_cart,
+                color: Colors.black,
               ),
-              SizedBox(height: MARGIN_MEDIUM_2),
-              Padding(
-                padding:
+            ),
+          ],
+        ),
+        body: Container(
+          child: SingleChildScrollView(
+            child: Selector<ProductDetailBloc, ItemVO?>(
+              selector: (context, bloc) => bloc.item,
+              builder: (context, item, child) => Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      top: MARGIN_MEDIUM_3,
+                      left: MARGIN_MEDIUM_2,
+                      right: MARGIN_MEDIUM_2,
+                    ),
+                    child: ProductImageAndNameSectionView(item: item),
+                  ),
+                  SizedBox(height: MARGIN_MEDIUM_2),
+                  Padding(
+                    padding:
                     const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
-                child: CartAndInStockSectionView(),
+                    child: CartAndInStockSectionView(),
+                  ),
+                  SizedBox(height: MARGIN_MEDIUM_2),
+                  AboutProductSectionView(
+                    item: item,
+                  ),
+                  SizedBox(height: MARGIN_MEDIUM_2),
+                  Visibility(
+                    visible: (item?.numberOfReviews ?? 0) != 0,
+                    child: ReviewSectionView(
+                      reviewVo: (item?.reviews?.isNotEmpty ?? false)
+                          ? item?.reviews?.last
+                          : ReviewVO(),
+                      reviewList: item?.reviews ?? [],
+                    ),
+                  ),
+                  SizedBox(height: MARGIN_MEDIUM_2),
+                  WriteReviewSectionView(),
+                  SizedBox(height: MARGIN_LARGE),
+                ],
               ),
-              SizedBox(height: MARGIN_MEDIUM_2),
-              AboutProductSectionView(),
-              SizedBox(height: MARGIN_MEDIUM_2),
-              ReviewSectionView(),
-              SizedBox(height: MARGIN_MEDIUM_2),
-              WriteReviewSectionView(),
-              SizedBox(height: MARGIN_LARGE),
-            ],
+            ),
           ),
         ),
       ),
@@ -82,7 +111,6 @@ class WriteReviewSectionView extends StatefulWidget {
 }
 
 class _WriteReviewSectionViewState extends State<WriteReviewSectionView> {
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -102,7 +130,29 @@ class _WriteReviewSectionViewState extends State<WriteReviewSectionView> {
             borderRadius: BorderRadius.circular(MARGIN_MEDIUM),
             border: Border.all(color: BORDER_COLOR),
           ),
-          child: RatingAndCommentView(),
+          child: RatingAndCommentView(
+            onChangeDropdown: (dropdownValue) {
+              ProductDetailBloc bloc =
+                  Provider.of<ProductDetailBloc>(context, listen: false);
+              bloc.onChangedDropdown(dropdownValue);
+            },
+            onChangedTextField: (comment) {
+              ProductDetailBloc bloc =
+                  Provider.of<ProductDetailBloc>(context, listen: false);
+              bloc.onChangedComment(comment);
+            },
+            onTappedButton: () {
+              ProductDetailBloc bloc =
+                  Provider.of<ProductDetailBloc>(context, listen: false);
+              bloc.onTappedButton().then((value) {}).catchError((error) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(error.toString()),
+                  ),
+                );
+              });
+            },
+          ),
         ),
       ],
     );
@@ -110,9 +160,13 @@ class _WriteReviewSectionViewState extends State<WriteReviewSectionView> {
 }
 
 class ReviewSectionView extends StatelessWidget {
-  const ReviewSectionView({
-    Key? key,
-  }) : super(key: key);
+  final ReviewVO? reviewVo;
+  final List<ReviewVO> reviewList;
+
+  ReviewSectionView({
+    required this.reviewVo,
+    required this.reviewList,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -133,14 +187,75 @@ class ReviewSectionView extends StatelessWidget {
             borderRadius: BorderRadius.circular(MARGIN_MEDIUM),
             border: Border.all(color: BORDER_COLOR),
           ),
-          child: CustomerReviewView(),
+          child: CustomerReviewView(review: reviewVo),
         ),
         SizedBox(height: MARGIN_MEDIUM),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
-          child: SeeAllTextView(),
+          child: GestureDetector(
+            onTap: () {
+              showAlertDialog(context, reviewList);
+            },
+            child: SeeAllTextView(),
+          ),
         ),
       ],
+    );
+  }
+
+  showAlertDialog(BuildContext context, List<ReviewVO> reviewList) {
+    // set up the Alert Dialog
+    AlertDialog alert = AlertDialog(
+      contentPadding: EdgeInsets.zero,
+      content: Padding(
+        padding: const EdgeInsets.only(
+            left: MARGIN_MEDIUM, right: MARGIN_MEDIUM, top: MARGIN_MEDIUM),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                  icon: Icon(
+                    Icons.close,
+                    color: SECONDARY_DARK_COLOR,
+                    size: MARGIN_MEDIUM_3,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+            SizedBox(height: MARGIN_MEDIUM),
+            Container(
+              height: MediaQuery.of(context).size.height * 1.5 / 3,
+              child: ListView.separated(
+                padding: EdgeInsets.only(
+                    right: MARGIN_MEDIUM,
+                    left: MARGIN_MEDIUM,
+                    bottom: MARGIN_CARD_MEDIUM_2),
+                itemCount: reviewList.length,
+                itemBuilder: (context, index) {
+                  return CustomerReviewView(review: reviewList[index]);
+                },
+                separatorBuilder: (BuildContext context, int index) {
+                  return SizedBox(height: MARGIN_LARGE);
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (context) {
+        return alert;
+      },
     );
   }
 }
@@ -169,9 +284,9 @@ class SeeAllTextView extends StatelessWidget {
 }
 
 class AboutProductSectionView extends StatelessWidget {
-  const AboutProductSectionView({
-    Key? key,
-  }) : super(key: key);
+  final ItemVO? item;
+
+  AboutProductSectionView({required this.item});
 
   @override
   Widget build(BuildContext context) {
@@ -194,21 +309,21 @@ class AboutProductSectionView extends StatelessWidget {
           ),
           child: Column(
             children: [
-              ProductDescriptionView(label: "Brand", description: "Logitech G"),
+              ProductDescriptionView(
+                  label: "Brand", description: item?.brand ?? ""),
               SizedBox(height: MARGIN_MEDIUM_2),
               ProductDescriptionView(
-                  label: "Model", description: "Logitech G240"),
+                  label: "Model", description: item?.modelName ?? ""),
               SizedBox(height: MARGIN_MEDIUM_2),
               ProductDescriptionView(
-                  label: "Operating System", description: "Optional"),
+                  label: "Operating System",
+                  description: item?.operatingSystem ?? ""),
               SizedBox(height: MARGIN_MEDIUM_2),
               ProductDescriptionView(
-                  label: "Graphic Card", description: "Optional"),
+                  label: "Graphic Card", description: item?.graphicCard ?? ""),
               SizedBox(height: MARGIN_MEDIUM_2),
               ProductDescriptionView(
-                  label: "Description",
-                  description:
-                      "Logitech G240 Cloth Gaming Mouse Pad for Low DPI Gaming"),
+                  label: "Description", description: item?.description ?? ""),
             ],
           ),
         ),
@@ -282,9 +397,9 @@ class CartAndInStockSectionView extends StatelessWidget {
 }
 
 class ProductImageAndNameSectionView extends StatelessWidget {
-  const ProductImageAndNameSectionView({
-    Key? key,
-  }) : super(key: key);
+  final ItemVO? item;
+
+  ProductImageAndNameSectionView({required this.item});
 
   @override
   Widget build(BuildContext context) {
@@ -292,7 +407,8 @@ class ProductImageAndNameSectionView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Image.network(
-          "https://res.cloudinary.com/dqscrfky2/image/upload/v1666593361/u5vmwuhm00kagvkarmme.png",
+          item?.image ??
+              "https://media.istockphoto.com/id/1147544807/vector/thumbnail-image-vector-graphic.jpg?s=612x612&w=0&k=20&c=rnCKVbdxqkjlcs3xH87-9gocETqpspHFXu5dIGB4wuM=",
           height: 100,
         ),
         SizedBox(width: MARGIN_MEDIUM_2),
@@ -300,7 +416,7 @@ class ProductImageAndNameSectionView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Logitech G240",
+              item?.name ?? "",
               style: TextStyle(
                 fontSize: TEXT_REGULAR_2X,
                 fontWeight: FontWeight.bold,
@@ -308,16 +424,16 @@ class ProductImageAndNameSectionView extends StatelessWidget {
             ),
             SizedBox(height: MARGIN_MEDIUM),
             Text(
-              "\$ 9.99",
+              "\$ ${item?.price}",
               style: TextStyle(
                 fontWeight: FontWeight.w600,
               ),
             ),
             SizedBox(height: MARGIN_MEDIUM),
-            RatingView(),
+            RatingView(rating: item?.rating ?? 0),
             SizedBox(height: MARGIN_MEDIUM),
             Text(
-              "1 Reviews",
+              "${item?.numberOfReviews} Reviews",
               style: TextStyle(
                 fontWeight: FontWeight.w500,
               ),

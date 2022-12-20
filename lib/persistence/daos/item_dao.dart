@@ -29,11 +29,15 @@ class ItemDao {
     await getItemBox().put(item!.id, item);
   }
 
+  void removeAllItemsFromDatabase() async{
+    await getItemBox().deleteAll(getItemBox().keys.toList());
+  }
+
   List<ItemVO> getAllItems() {
     return getItemBox().values.toList();
   }
 
-  ItemVO? getItemById(int itemId) {
+  ItemVO? getItemById(String itemId) {
     return getItemBox().get(itemId);
   }
 
@@ -44,11 +48,10 @@ class ItemDao {
 
   Stream<List<ItemVO>> getAllItemsStream() {
     List<ItemVO> allItems = getAllItems();
-    allItems.sort((a, b) => (b.createdAt ?? "").compareTo(a.createdAt ?? ""));
     return Stream.value(allItems);
   }
 
-  Stream<ItemVO?> getItemByIdStream(int itemId) {
+  Stream<ItemVO?> getItemByIdStream(String itemId) {
     return Stream.value(getItemById(itemId));
   }
 
@@ -56,14 +59,13 @@ class ItemDao {
   List<ItemVO> getAllItemsForReactive() {
     if (getAllItems() != null && getAllItems().isNotEmpty) {
       List<ItemVO> allItems = getAllItems();
-      allItems.sort((a, b) => (b.createdAt ?? "").compareTo(a.createdAt ?? ""));
       return allItems;
     } else {
       return [];
     }
   }
 
-  ItemVO? getItemByIdForReactive(int itemId) {
+  ItemVO? getItemByIdForReactive(String itemId) {
     if(getItemById(itemId) != null) {
       return getItemById(itemId);
     } else {

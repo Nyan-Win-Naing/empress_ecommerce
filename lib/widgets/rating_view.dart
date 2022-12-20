@@ -14,6 +14,7 @@ class RatingView extends StatelessWidget {
     return RatingBar.builder(
       ignoreGestures: true,
       initialRating: rating,
+      allowHalfRating: true,
       itemBuilder: (context, index) {
         return Icon(
           Icons.star,

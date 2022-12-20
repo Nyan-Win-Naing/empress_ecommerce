@@ -43,4 +43,8 @@ class ReviewVO {
   factory ReviewVO.fromJson(Map<String, dynamic> json) => _$ReviewVOFromJson(json);
 
   Map<String, dynamic> toJson() => _$ReviewVOToJson(this);
+
+  String getReviewDate() {
+    return createdAt?.split("T").first ?? "";
+  }
 }

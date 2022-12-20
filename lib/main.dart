@@ -1,4 +1,5 @@
 import 'package:empress_ecommerce_app/data/models/user_model_impl.dart';
+import 'package:empress_ecommerce_app/data/vos/category_vo.dart';
 import 'package:empress_ecommerce_app/data/vos/item_vo.dart';
 import 'package:empress_ecommerce_app/data/vos/review_vo.dart';
 import 'package:empress_ecommerce_app/data/vos/user_vo.dart';
@@ -16,9 +17,11 @@ void main() async {
   Hive.registerAdapter(UserVOAdapter());
   Hive.registerAdapter(ItemVOAdapter());
   Hive.registerAdapter(ReviewVOAdapter());
+  Hive.registerAdapter(CategoryVOAdapter());
 
   await Hive.openBox<UserVO>(BOX_NAME_USER_VO);
   await Hive.openBox<ItemVO>(BOX_NAME_ITEM_VO);
+  await Hive.openBox<CategoryVO>(BOX_NAME_CATEGORY_VO);
 
   runApp(MyApp());
 }

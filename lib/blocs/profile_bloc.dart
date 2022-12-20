@@ -7,6 +7,8 @@ class ProfileBloc extends ChangeNotifier {
   /// States
   bool _disposed = false;
   UserVO? loggedInUser;
+  String username = "";
+  String email = "";
 
   /// Model
   UserModel _mUserModel = UserModelImpl();
@@ -16,6 +18,7 @@ class ProfileBloc extends ChangeNotifier {
       if(userList.isNotEmpty) {
         loggedInUser = userList[0];
         notifyListeners();
+        print(loggedInUser?.token);
       }
     }).onError((error) {
       debugPrint(error.toString());
@@ -24,6 +27,33 @@ class ProfileBloc extends ChangeNotifier {
 
   Future<void> onTapLogout() {
     return _mUserModel.logout().whenComplete(() {});
+  }
+
+  void onNameChanged(String username) {
+    this.username = username;
+  }
+
+  void onEmailChanged(String email) {
+    this.email = email;
+  }
+
+  Future<UserVO?> onTapUpdate() {
+    if(username.isEmpty || email.isEmpty) {
+      return Future.error("All fields must be filled!");
+    } else {
+      return _mUserModel.updateProfile(username, email).then((user) {
+        clearAllText();
+        return Future.value(user);
+      }).catchError((error) {
+        debugPrint(error.toString());
+      });
+    }
+  }
+
+  void clearAllText() {
+    username = "";
+    email = "";
+    notifyListeners();
   }
 
   @override

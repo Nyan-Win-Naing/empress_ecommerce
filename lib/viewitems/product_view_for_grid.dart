@@ -1,3 +1,4 @@
+import 'package:empress_ecommerce_app/data/vos/item_vo.dart';
 import 'package:empress_ecommerce_app/resources/colors.dart';
 import 'package:empress_ecommerce_app/resources/dimens.dart';
 import 'package:flutter/material.dart';
@@ -5,9 +6,10 @@ import 'package:flutter/material.dart';
 class ProductViewForGrid extends StatelessWidget {
 
   final bool is3xGrid;
+  final ItemVO? item;
 
 
-  ProductViewForGrid({this.is3xGrid = true});
+  ProductViewForGrid({this.is3xGrid = true, required this.item});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +27,7 @@ class ProductViewForGrid extends StatelessWidget {
                   border: Border.all(color: BORDER_COLOR),
                 ),
                 child: Image.network(
-                  "https://res.cloudinary.com/dqscrfky2/image/upload/v1666593361/u5vmwuhm00kagvkarmme.png",
+                  item?.image ?? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/681px-Placeholder_view_vector.svg.png",
                 ),
               ),
               Align(
@@ -42,7 +44,7 @@ class ProductViewForGrid extends StatelessWidget {
           ),
           SizedBox(height: MARGIN_MEDIUM),
           Text(
-            "Logitech G240",
+            item?.name ?? "",
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
@@ -53,7 +55,7 @@ class ProductViewForGrid extends StatelessWidget {
           ),
           SizedBox(height: MARGIN_SMALL),
           Text(
-            "Logitech G",
+            item?.brand ?? "",
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
@@ -62,7 +64,7 @@ class ProductViewForGrid extends StatelessWidget {
           ),
           SizedBox(height: MARGIN_SMALL),
           Text(
-            "\$ 9.99",
+            "\$ ${item?.price ?? 0}",
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(

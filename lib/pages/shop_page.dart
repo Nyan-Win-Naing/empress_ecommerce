@@ -1,3 +1,8 @@
+import 'package:empress_ecommerce_app/blocs/home_bloc.dart';
+import 'package:empress_ecommerce_app/blocs/shop_bloc.dart';
+import 'package:empress_ecommerce_app/data/vos/category_vo.dart';
+import 'package:empress_ecommerce_app/data/vos/item_vo.dart';
+import 'package:empress_ecommerce_app/pages/product_detail_page.dart';
 import 'package:empress_ecommerce_app/resources/colors.dart';
 import 'package:empress_ecommerce_app/resources/dimens.dart';
 import 'package:empress_ecommerce_app/viewitems/category_chip_view.dart';
@@ -5,6 +10,7 @@ import 'package:empress_ecommerce_app/viewitems/product_view_for_grid.dart';
 import 'package:empress_ecommerce_app/viewitems/product_view_for_vertical.dart';
 import 'package:empress_ecommerce_app/widgets/rating_view.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ShopPage extends StatefulWidget {
   @override
@@ -12,58 +18,121 @@ class ShopPage extends StatefulWidget {
 }
 
 class _ShopPageState extends State<ShopPage> {
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (context) => ShopBloc(),
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          centerTitle: true,
+          title: Text(
+            "Shop",
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          actions: [
+            Padding(
+              padding: EdgeInsets.only(right: MARGIN_MEDIUM),
+              child: Icon(
+                Icons.search,
+                color: Colors.black,
+              ),
+            ),
+          ],
+        ),
+        body: Container(
+          child: Builder(builder: (context) {
+            return ShopPageScrollView(
+              onListEndReached: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    behavior: SnackBarBehavior.floating,
+                    content: Text("Loading Data"),
+                  ),
+                );
+                ShopBloc bloc = Provider.of<ShopBloc>(context, listen: false);
+                bloc.onItemListEndReached();
+              },
+            );
+          }),
+        ),
+      ),
+    );
+  }
+}
+
+class ShopPageScrollView extends StatefulWidget {
+  final Function onListEndReached;
+
+  ShopPageScrollView({required this.onListEndReached});
+
+  @override
+  State<ShopPageScrollView> createState() => _ShopPageScrollViewState();
+}
+
+class _ShopPageScrollViewState extends State<ShopPageScrollView> {
   String view = "listView";
+  var _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.atEdge) {
+        if (_scrollController.position.pixels == 0) {
+          print("Start of the list reached");
+        } else {
+          print("End of the list reached");
+          widget.onListEndReached();
+        }
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        title: Text(
-          "Shop",
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w700,
+    return SingleChildScrollView(
+      controller: _scrollController,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: MARGIN_MEDIUM),
+          Selector<ShopBloc, List<CategoryVO>>(
+            selector: (context, bloc) => bloc.categoryList ?? [],
+            shouldRebuild: (previous, next) => previous != next,
+            builder: (context, categoryList, child) =>
+                HorizontalCategoryListSectionView(
+              categoryList: categoryList,
+            ),
           ),
-        ),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: MARGIN_MEDIUM),
-            child: Icon(
-              Icons.search,
-              color: Colors.black,
+          SizedBox(height: MARGIN_MEDIUM),
+          FilterSectionView(
+            onTapChangeView: () {
+              setState(() {
+                if (view == "listView") {
+                  view = "3xGrid";
+                } else if (view == "3xGrid") {
+                  view = "2xGrid";
+                } else {
+                  view = "listView";
+                }
+              });
+            },
+            view: view,
+          ),
+          SizedBox(height: MARGIN_MEDIUM_2),
+          Selector<ShopBloc, List<ItemVO>>(
+            selector: (context, bloc) => bloc.itemList ?? [],
+            builder: (context, itemList, child) => ProductListSectionView(
+              view: view,
+              itemList: itemList,
             ),
           ),
         ],
-      ),
-      body: Container(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: MARGIN_MEDIUM),
-              HorizontalCategoryListSectionView(),
-              SizedBox(height: MARGIN_MEDIUM),
-              FilterSectionView(
-                onTapChangeView: () {
-                  setState(() {
-                    if (view == "listView") {
-                      view = "3xGrid";
-                    } else if (view == "3xGrid") {
-                      view = "2xGrid";
-                    } else {
-                      view = "listView";
-                    }
-                  });
-                },
-                view: view,
-              ),
-              SizedBox(height: MARGIN_MEDIUM_2),
-              ProductListSectionView(view: view),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -71,8 +140,9 @@ class _ShopPageState extends State<ShopPage> {
 
 class ProductListSectionView extends StatelessWidget {
   final String view;
+  final List<ItemVO> itemList;
 
-  ProductListSectionView({required this.view});
+  ProductListSectionView({required this.view, required this.itemList});
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +152,7 @@ class ProductListSectionView extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
           child: Text(
-            "26 results",
+            "${itemList.length} results",
             style: TextStyle(
               fontWeight: FontWeight.w500,
             ),
@@ -90,10 +160,10 @@ class ProductListSectionView extends StatelessWidget {
         ),
         SizedBox(height: MARGIN_XLARGE),
         (view == "listView")
-            ? VerticalProductListView()
+            ? VerticalProductListView(itemList: itemList)
             : (view == "3xGrid")
-                ? Grid3xProductListView()
-                : Grid2xProductListView(),
+                ? Grid3xProductListView(itemList: itemList)
+                : Grid2xProductListView(itemList: itemList),
         // VerticalProductListView(),
         // Grid3xProductListView(),
         // Grid2xProductListView(),
@@ -103,14 +173,14 @@ class ProductListSectionView extends StatelessWidget {
 }
 
 class Grid3xProductListView extends StatelessWidget {
-  const Grid3xProductListView({
-    Key? key,
-  }) : super(key: key);
+  final List<ItemVO> itemList;
+
+  Grid3xProductListView({required this.itemList});
 
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      itemCount: 10,
+      itemCount: itemList.length,
       physics: NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       padding: EdgeInsets.only(left: MARGIN_MEDIUM_2),
@@ -119,21 +189,28 @@ class Grid3xProductListView extends StatelessWidget {
         childAspectRatio: 2.2 / 4,
       ),
       itemBuilder: (context, index) {
-        return ProductViewForGrid();
+        return GestureDetector(
+          onTap: () {
+            navigateToProductDetailPage(context, index, itemList);
+          },
+          child: ProductViewForGrid(
+            item: itemList[index],
+          ),
+        );
       },
     );
   }
 }
 
 class Grid2xProductListView extends StatelessWidget {
-  const Grid2xProductListView({
-    Key? key,
-  }) : super(key: key);
+  final List<ItemVO> itemList;
+
+  Grid2xProductListView({required this.itemList});
 
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      itemCount: 10,
+      itemCount: itemList.length,
       physics: NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       padding: EdgeInsets.only(left: MARGIN_MEDIUM_2),
@@ -142,16 +219,24 @@ class Grid2xProductListView extends StatelessWidget {
         childAspectRatio: 3 / 4.5,
       ),
       itemBuilder: (context, index) {
-        return ProductViewForGrid(is3xGrid: false);
+        return GestureDetector(
+          onTap: () {
+            navigateToProductDetailPage(context, index, itemList);
+          },
+          child: ProductViewForGrid(
+            is3xGrid: false,
+            item: itemList[index],
+          ),
+        );
       },
     );
   }
 }
 
 class VerticalProductListView extends StatelessWidget {
-  const VerticalProductListView({
-    Key? key,
-  }) : super(key: key);
+  final List<ItemVO> itemList;
+
+  VerticalProductListView({required this.itemList});
 
   @override
   Widget build(BuildContext context) {
@@ -159,12 +244,29 @@ class VerticalProductListView extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
-      itemCount: 10,
+      itemCount: itemList.length,
       itemBuilder: (context, index) {
-        return ProductViewForVertical();
+        return GestureDetector(
+          onTap: () {
+            navigateToProductDetailPage(context, index, itemList);
+          },
+          child: ProductViewForVertical(
+            item: itemList[index],
+          ),
+        );
       },
     );
   }
+}
+
+void navigateToProductDetailPage(
+    BuildContext context, int index, List<ItemVO> itemList) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => ProductDetailPage(itemId: itemList[index].id ?? ""),
+    ),
+  );
 }
 
 class FilterSectionView extends StatelessWidget {
@@ -180,19 +282,27 @@ class FilterSectionView extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          FilterNameAndIconView(
-            label: "Sort by",
-            iconData: Icons.sort,
-            onTap: () {
-              _sortByBottomSheet(context);
-            },
+          Selector<ShopBloc, String>(
+            selector: (context, bloc) => bloc.sortBy,
+            builder: (context, sortBy, child) => FilterNameAndIconView(
+              label: "Sort by",
+              iconData: Icons.sort,
+              onTap: () {
+                ShopBloc bloc = Provider.of<ShopBloc>(context, listen: false);
+                _sortByBottomSheet(context, sortBy, bloc);
+              },
+            ),
           ),
-          FilterNameAndIconView(
-            label: "Ratings",
-            iconData: Icons.repeat,
-            onTap: () {
-              _ratingsBottomSheet(context);
-            },
+          Selector<ShopBloc, String>(
+            selector: (context, bloc) => bloc.selectedRating,
+            builder: (context, rating, child) => FilterNameAndIconView(
+              label: "Ratings",
+              iconData: Icons.repeat,
+              onTap: () {
+                ShopBloc bloc = Provider.of<ShopBloc>(context, listen: false);
+                _ratingsBottomSheet(context, rating, bloc);
+              },
+            ),
           ),
           FilterNameAndIconView(
             label: "Views",
@@ -206,9 +316,8 @@ class FilterSectionView extends StatelessWidget {
     );
   }
 
-  void _ratingsBottomSheet(BuildContext context) {
-
-    double groupValue = 4.0;
+  void _ratingsBottomSheet(BuildContext context, String rating, ShopBloc bloc) {
+    String groupValue = rating;
 
     showModalBottomSheet(
       context: context,
@@ -229,51 +338,56 @@ class FilterSectionView extends StatelessWidget {
                     children: [
                       RadioViewForRating(
                         rating: 4,
-                        value: 4,
+                        value: "4",
                         groupValue: groupValue,
                         onTap: (newValue) {
                           setState(() {
                             groupValue = newValue;
+                            bloc.onTapRating(newValue);
                           });
                         },
                       ),
                       RadioViewForRating(
                         rating: 3,
-                        value: 3,
+                        value: "3",
                         groupValue: groupValue,
                         onTap: (newValue) {
                           setState(() {
                             groupValue = newValue;
+                            bloc.onTapRating(newValue);
                           });
                         },
                       ),
                       RadioViewForRating(
                         rating: 2,
-                        value: 2,
+                        value: "2",
                         groupValue: groupValue,
                         onTap: (newValue) {
                           setState(() {
                             groupValue = newValue;
+                            bloc.onTapRating(newValue);
                           });
                         },
                       ),
                       RadioViewForRating(
                         rating: 1,
-                        value: 1,
+                        value: "1",
                         groupValue: groupValue,
                         onTap: (newValue) {
                           setState(() {
                             groupValue = newValue;
+                            bloc.onTapRating(newValue);
                           });
                         },
                       ),
                       RadioViewForRating(
                         rating: 0,
-                        value: 0,
+                        value: "0",
                         groupValue: groupValue,
                         onTap: (newValue) {
                           setState(() {
                             groupValue = newValue;
+                            bloc.onTapRating(newValue);
                           });
                         },
                       ),
@@ -288,8 +402,8 @@ class FilterSectionView extends StatelessWidget {
     );
   }
 
-  void _sortByBottomSheet(BuildContext context) {
-    String groupValue = "new_arrivals";
+  void _sortByBottomSheet(BuildContext context, String sortBy, ShopBloc bloc) {
+    String groupValue = sortBy;
 
     showModalBottomSheet(
       context: context,
@@ -310,41 +424,45 @@ class FilterSectionView extends StatelessWidget {
                     children: [
                       RadioViewForSortBy(
                         title: "New Arrivals",
-                        value: "new_arrivals",
+                        value: "newest",
                         groupValue: groupValue,
                         onTap: (newValue) {
                           setState(() {
                             groupValue = newValue;
+                            bloc.onTapSortBy(newValue);
                           });
                         },
                       ),
                       RadioViewForSortBy(
                         title: "Price: Low to High",
-                        value: "low_to_high",
+                        value: "lowest",
                         groupValue: groupValue,
                         onTap: (newValue) {
                           setState(() {
                             groupValue = newValue;
+                            bloc.onTapSortBy(newValue);
                           });
                         },
                       ),
                       RadioViewForSortBy(
                         title: "Price: High to Low",
-                        value: "high_to_low",
+                        value: "highest",
                         groupValue: groupValue,
                         onTap: (newValue) {
                           setState(() {
                             groupValue = newValue;
+                            bloc.onTapSortBy(newValue);
                           });
                         },
                       ),
                       RadioViewForSortBy(
                         title: "Customer Rating",
-                        value: "customer_rating",
+                        value: "toprated",
                         groupValue: groupValue,
                         onTap: (newValue) {
                           setState(() {
                             groupValue = newValue;
+                            bloc.onTapSortBy(newValue);
                           });
                         },
                       ),
@@ -408,9 +526,9 @@ class RadioViewForSortBy extends StatelessWidget {
 
 class RadioViewForRating extends StatelessWidget {
   final double rating;
-  final double value;
-  final double groupValue;
-  final Function(double) onTap;
+  final String value;
+  final String groupValue;
+  final Function(String) onTap;
 
   RadioViewForRating({
     required this.rating,
@@ -429,10 +547,9 @@ class RadioViewForRating extends StatelessWidget {
           Text(
             "Up",
             style: TextStyle(
-              color: SECONDARY_DARK_COLOR,
-              fontWeight: FontWeight.w500,
-              fontSize: TEXT_REGULAR_2X
-            ),
+                color: SECONDARY_DARK_COLOR,
+                fontWeight: FontWeight.w500,
+                fontSize: TEXT_REGULAR_2X),
           ),
         ],
       ),
@@ -442,7 +559,7 @@ class RadioViewForRating extends StatelessWidget {
       value: value,
       groupValue: groupValue,
       onChanged: (value) {
-        onTap(value ?? 0);
+        onTap(value ?? "");
       },
     );
   }
@@ -536,22 +653,76 @@ class FilterTitleView extends StatelessWidget {
 }
 
 class HorizontalCategoryListSectionView extends StatelessWidget {
-  const HorizontalCategoryListSectionView({
+  final List<CategoryVO> categoryList;
+
+  HorizontalCategoryListSectionView({required this.categoryList});
+
+  @override
+  Widget build(BuildContext context) {
+    return Selector<ShopBloc, bool>(
+      selector: (context, bloc) => bloc.isShowClearButton,
+      builder: (context, isShowClearButton, child) => Container(
+        height: 60,
+        // color: Colors.blue,
+        // child: ListView.builder(
+        //   padding: EdgeInsets.only(left: MARGIN_MEDIUM_2),
+        //   scrollDirection: Axis.horizontal,
+        //   itemCount: categoryList.length,
+        //   itemBuilder: (context, index) {
+        //     return CategoryChipView(
+        //       category: categoryList[index],
+        //     );
+        //   },
+        // ),
+        child: ListView(
+          padding: EdgeInsets.only(left: MARGIN_MEDIUM_2),
+          scrollDirection: Axis.horizontal,
+          children: [
+            Visibility(
+              visible: isShowClearButton,
+              child: GestureDetector(
+                onTap: () {
+                  ShopBloc bloc = Provider.of<ShopBloc>(context, listen: false);
+                  bloc.onTapClear();
+                },
+                child: CategoryCloseView(),
+              ),
+            ),
+            ...categoryList.map((categoryVo) {
+              return GestureDetector(
+                onTap: () {
+                  ShopBloc bloc = Provider.of<ShopBloc>(context, listen: false);
+                  bloc.onTapCategory(categoryVo.category ?? "");
+                },
+                child: CategoryChipView(category: categoryVo),
+              );
+            }).toList(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class CategoryCloseView extends StatelessWidget {
+  const CategoryCloseView({
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 60,
-      // color: Colors.blue,
-      child: ListView.builder(
-        padding: EdgeInsets.only(left: MARGIN_MEDIUM_2),
-        scrollDirection: Axis.horizontal,
-        itemCount: 10,
-        itemBuilder: (context, index) {
-          return CategoryChipView();
-        },
+      margin: EdgeInsets.only(right: MARGIN_MEDIUM),
+      width: 30,
+      height: 30,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: CATEGORY_CHIP_COLOR,
+      ),
+      child: Icon(
+        Icons.close,
+        color: SECONDARY_DARK_COLOR,
+        size: MARGIN_MEDIUM_3,
       ),
     );
   }

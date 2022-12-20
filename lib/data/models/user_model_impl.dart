@@ -1,6 +1,7 @@
 import 'package:empress_ecommerce_app/data/models/user_model.dart';
 import 'package:empress_ecommerce_app/data/vos/login_request_vo.dart';
 import 'package:empress_ecommerce_app/data/vos/sign_up_request_vo.dart';
+import 'package:empress_ecommerce_app/data/vos/update_profile_request.dart';
 import 'package:empress_ecommerce_app/data/vos/user_vo.dart';
 import 'package:empress_ecommerce_app/network/dataagents/empress_data_agent.dart';
 import 'package:empress_ecommerce_app/network/dataagents/retrofit_data_agent_impl.dart';
@@ -22,6 +23,11 @@ class UserModelImpl extends UserModel {
   /// Daos
   UserDao mUserDao = UserDao();
 
+  String getBearerToken() {
+    String userToken = mUserDao.getAllUsers().first.token ?? "";
+    return "Bearer $userToken";
+  }
+
   @override
   Future<UserVO?> postLogin(String email, String password) {
     LoginRequestVO loginRequestVo = LoginRequestVO(
@@ -42,6 +48,21 @@ class UserModelImpl extends UserModel {
       password: password,
     );
     return mDataAgent.postSignUp(signUpRequest).then((user) {
+      mUserDao.saveSingleUser(user);
+      return Future.value(user);
+    });
+  }
+
+  @override
+  Future<UserVO?> updateProfile(String name, String email) {
+    UpdateProfileRequest updateProfileRequest = UpdateProfileRequest(
+      name: name,
+      email: email,
+      password: "",
+    );
+    return mDataAgent
+        .updateProfile(getBearerToken(), updateProfileRequest)
+        .then((user) async {
       mUserDao.saveSingleUser(user);
       return Future.value(user);
     });

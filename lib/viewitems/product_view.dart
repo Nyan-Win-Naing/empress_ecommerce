@@ -18,7 +18,7 @@ class ProductView extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProductDetailPage(),
+            builder: (context) => ProductDetailPage(itemId: item?.id ?? ""),
           ),
         );
       },

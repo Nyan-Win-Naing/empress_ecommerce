@@ -305,24 +305,28 @@ class DeliveryAddressSectionView extends StatelessWidget {
           label: "Full Name",
           hintText: "Enter your full name",
           onChanged: (value) {},
+          textEditingController: TextEditingController(),
         ),
         SizedBox(height: MARGIN_LARGE),
         LabelAndTextFieldView(
           label: "State",
           hintText: "Enter your living state",
           onChanged: (value) {},
+          textEditingController: TextEditingController(),
         ),
         SizedBox(height: MARGIN_LARGE),
         LabelAndTextFieldView(
           label: "City",
           hintText: "Enter city",
           onChanged: (value) {},
+          textEditingController: TextEditingController(),
         ),
         SizedBox(height: MARGIN_LARGE),
         LabelAndTextFieldView(
           label: "Address",
           hintText: "Enter your full address",
           onChanged: (value) {},
+          textEditingController: TextEditingController(),
         ),
       ],
     );

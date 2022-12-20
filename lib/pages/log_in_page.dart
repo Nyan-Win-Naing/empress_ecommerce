@@ -91,6 +91,7 @@ class LogInSectionView extends StatelessWidget {
             LogInBloc bloc = Provider.of<LogInBloc>(context, listen: false);
             bloc.onEmailChanged(value);
           },
+          textEditingController: TextEditingController(),
         ),
         SizedBox(height: MARGIN_XLARGE),
         LabelAndTextFieldView(
@@ -102,6 +103,7 @@ class LogInSectionView extends StatelessWidget {
             LogInBloc bloc = Provider.of<LogInBloc>(context, listen: false);
             bloc.onPasswordChanged(value);
           },
+          textEditingController: TextEditingController(),
         ),
         SizedBox(height: MARGIN_XLARGE),
         MaterialButton(

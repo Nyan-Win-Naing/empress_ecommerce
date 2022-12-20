@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:empress_ecommerce_app/blocs/profile_bloc.dart';
 import 'package:empress_ecommerce_app/data/vos/user_vo.dart';
 import 'package:empress_ecommerce_app/pages/log_in_page.dart';
@@ -64,10 +66,13 @@ class ProfilePage extends StatelessWidget {
                       ProfileSectionView(userVo: loggedInUser),
                 ),
                 SizedBox(height: MARGIN_XXLARGE),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
-                  child: EditProfileSectionView(),
+                Selector<ProfileBloc, UserVO?>(
+                  selector: (context, bloc) => bloc.loggedInUser,
+                  builder: (context, loggedInUser, child) => Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
+                    child: EditProfileSectionView(loggedInUser: loggedInUser),
+                  ),
                 ),
               ],
             ),
@@ -88,9 +93,9 @@ class ProfilePage extends StatelessWidget {
 }
 
 class EditProfileSectionView extends StatelessWidget {
-  const EditProfileSectionView({
-    Key? key,
-  }) : super(key: key);
+  final UserVO? loggedInUser;
+
+  EditProfileSectionView({required this.loggedInUser});
 
   @override
   Widget build(BuildContext context) {
@@ -108,26 +113,44 @@ class EditProfileSectionView extends StatelessWidget {
               border: Border.all(color: BORDER_COLOR)),
           child: Column(
             children: [
-              LabelAndTextFieldView(
-                label: "Name",
-                hintText: "Maung Maung",
-                onChanged: (value) {},
+              Selector<ProfileBloc, String>(
+                selector: (context, bloc) => bloc.username,
+                builder: (context, username, child) => LabelAndTextFieldView(
+                  label: "Name",
+                  hintText: loggedInUser?.name ?? "",
+                  onChanged: (username) {
+                    ProfileBloc bloc = Provider.of(context, listen: false);
+                    bloc.onNameChanged(username);
+                  },
+                  textEditingController: TextEditingController(text: username),
+                ),
               ),
               SizedBox(height: MARGIN_LARGE),
-              LabelAndTextFieldView(
-                label: "Email",
-                hintText: "maungmaung123@gmail.com",
-                onChanged: (value) {},
+              Selector<ProfileBloc, String>(
+                selector: (context, bloc) => bloc.email,
+                builder: (context, email, child) => LabelAndTextFieldView(
+                  label: "Email",
+                  hintText: loggedInUser?.email ?? "",
+                  onChanged: (email) {
+                    ProfileBloc bloc = Provider.of(context, listen: false);
+                    bloc.onEmailChanged(email);
+                  },
+                  textEditingController: TextEditingController(text: email),
+                ),
               ),
               SizedBox(height: MARGIN_LARGE),
-              LabelAndTextFieldView(
-                label: "Password",
-                hintText: "Please enter your update password",
-                isPasswordField: true,
-                onChanged: (value) {},
+              EditButtonView(
+                onTap: () {
+                  ProfileBloc bloc = Provider.of(context, listen: false);
+                  bloc.onTapUpdate().then((value) {}).catchError((error) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(error.toString()),
+                      ),
+                    );
+                  });
+                },
               ),
-              SizedBox(height: MARGIN_LARGE),
-              EditButtonView(),
             ],
           ),
         ),
@@ -137,9 +160,9 @@ class EditProfileSectionView extends StatelessWidget {
 }
 
 class EditButtonView extends StatelessWidget {
-  const EditButtonView({
-    Key? key,
-  }) : super(key: key);
+  final Function onTap;
+
+  EditButtonView({required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +172,9 @@ class EditButtonView extends StatelessWidget {
       shape: new RoundedRectangleBorder(
         borderRadius: new BorderRadius.circular(MARGIN_MEDIUM),
       ),
-      onPressed: () {},
+      onPressed: () {
+        onTap();
+      },
       height: 40,
       child: Text(
         "Save Changes",

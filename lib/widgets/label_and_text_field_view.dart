@@ -8,11 +8,13 @@ class LabelAndTextFieldView extends StatefulWidget {
   final bool isPasswordField;
   final bool isSignIn;
   final Function(String) onChanged;
+  final TextEditingController textEditingController;
 
   LabelAndTextFieldView({
     required this.label,
     required this.hintText,
     required this.onChanged,
+    required this.textEditingController,
     this.isPasswordField = false,
     this.isSignIn = false,
   });
@@ -38,6 +40,7 @@ class _LabelAndTextFieldViewState extends State<LabelAndTextFieldView> {
         ),
         SizedBox(height: MARGIN_MEDIUM),
         TextField(
+          controller: widget.textEditingController,
           onChanged: (value) {
             widget.onChanged(value);
           },

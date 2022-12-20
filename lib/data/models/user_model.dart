@@ -4,6 +4,7 @@ abstract class UserModel {
   // Network
   Future<UserVO?> postLogin(String email, String password);
   Future<UserVO?> postSignUp(String name, String email, String password);
+  Future<UserVO?> updateProfile(String name, String email);
 
   // Database
   Stream<List<UserVO>> getAllUsersFromDatabase();

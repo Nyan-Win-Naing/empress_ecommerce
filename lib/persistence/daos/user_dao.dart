@@ -13,6 +13,7 @@ class UserDao {
 
   void saveSingleUser(UserVO? user) async {
     await getUserBox().put(user!.id, user);
+    print(getAllUsers());
   }
 
   List<UserVO> getAllUsers() {

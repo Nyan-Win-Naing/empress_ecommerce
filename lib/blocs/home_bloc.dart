@@ -14,7 +14,10 @@ class HomeBloc extends ChangeNotifier {
   HomeBloc() {
     /// New Arrival Items Database
     mItemModel.getNewArrivalItemsFromDatabase().listen((itemList) {
-      newArrivalItems = itemList;
+      if(itemList.isNotEmpty && itemList.length >= 6) {
+        itemList.sort((a, b) => (b.createdAt ?? "").compareTo(a.createdAt ?? ""));
+        newArrivalItems = itemList.getRange(0, 6).toList();
+      }
       notifyListeners();
     }).onError((error) {
       debugPrint(error.toString());

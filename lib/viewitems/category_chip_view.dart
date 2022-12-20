@@ -1,8 +1,14 @@
+import 'package:empress_ecommerce_app/data/vos/category_vo.dart';
 import 'package:empress_ecommerce_app/resources/colors.dart';
 import 'package:empress_ecommerce_app/resources/dimens.dart';
 import 'package:flutter/material.dart';
 
 class CategoryChipView extends StatelessWidget {
+
+  final CategoryVO category;
+
+
+  CategoryChipView({required this.category});
 
   @override
   Widget build(BuildContext context) {
@@ -10,12 +16,13 @@ class CategoryChipView extends StatelessWidget {
       padding: const EdgeInsets.only(right: MARGIN_MEDIUM),
       child: Chip(
         label: Text(
-          "Notebooks",
+          category.category ?? "",
           style: TextStyle(
             fontWeight: FontWeight.w500,
-            color: SECONDARY_DARK_COLOR,
+            color: (category.isSelected ?? false) ? Colors.white : SECONDARY_DARK_COLOR,
           ),
         ),
+        backgroundColor: (category.isSelected ?? false) ? Colors.blue : CATEGORY_CHIP_COLOR,
       ),
     );
   }

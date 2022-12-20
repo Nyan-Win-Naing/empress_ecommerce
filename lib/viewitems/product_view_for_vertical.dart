@@ -1,8 +1,15 @@
+import 'package:empress_ecommerce_app/data/vos/item_vo.dart';
 import 'package:empress_ecommerce_app/resources/colors.dart';
 import 'package:empress_ecommerce_app/resources/dimens.dart';
 import 'package:flutter/material.dart';
 
 class ProductViewForVertical extends StatelessWidget {
+
+  final ItemVO? item;
+
+
+  ProductViewForVertical({required this.item});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -19,7 +26,7 @@ class ProductViewForVertical extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Image.network(
-                  "https://res.cloudinary.com/dqscrfky2/image/upload/v1666593361/u5vmwuhm00kagvkarmme.png",
+                  item?.image ?? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/681px-Placeholder_view_vector.svg.png",
                   width: 100,
                 ),
                 SizedBox(width: MARGIN_MEDIUM_2),
@@ -28,7 +35,7 @@ class ProductViewForVertical extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      "Logitech G240",
+                      item?.name ?? "",
                       style: TextStyle(
                         fontSize: TEXT_REGULAR_2X,
                         color: SECONDARY_DARK_COLOR,
@@ -37,11 +44,11 @@ class ProductViewForVertical extends StatelessWidget {
                     ),
                     SizedBox(height: MARGIN_MEDIUM),
                     Text(
-                      "Logitech G",
+                      item?.brand ?? "",
                     ),
                     SizedBox(height: MARGIN_MEDIUM),
                     Text(
-                      "\$ 9.99",
+                      "\$ ${item?.price ?? 0}",
                       style: TextStyle(
                         color: SECONDARY_DARK_COLOR,
                         fontWeight: FontWeight.w600,

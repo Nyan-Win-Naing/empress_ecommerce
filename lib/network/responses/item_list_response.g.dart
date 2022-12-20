@@ -12,7 +12,7 @@ ItemListResponse _$ItemListResponseFromJson(Map<String, dynamic> json) =>
           ?.map((e) => ItemVO.fromJson(e as Map<String, dynamic>))
           .toList(),
       countItems: json['countItems'] as int?,
-      page: json['page'] as int?,
+      page: json['page'] as String?,
       pages: json['pages'] as int?,
     );
 

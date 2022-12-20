@@ -8,11 +8,13 @@ List<BannerVO> dummyBannerList = [
   BannerVO(image: "assets/mother_board.jpg", title: "Motherboards", description: "Choose the ideal motherboards for your computer!"),
 ];
 
-List<String> dummyRatingList = [
+List<int> dummyRatingList = [0, 1, 2, 3, 4, 5];
+
+List<String> dummyRatingTexts = [
   "Rating",
-  "1- Poor",
-  "2- Fair",
-  "3- Good",
-  "4- Very good",
-  "5- Excellent",
+  "1 - Poor",
+  "2 - Fair",
+  "3 - Good",
+  "4 - Very Good",
+  "5 - Excellent",
 ];

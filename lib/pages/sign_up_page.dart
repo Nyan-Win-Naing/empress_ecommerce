@@ -88,6 +88,7 @@ class SignUpSectionView extends StatelessWidget {
             SignUpBloc bloc = Provider.of<SignUpBloc>(context, listen: false);
             bloc.onNameChanged(name);
           },
+          textEditingController: TextEditingController(),
         ),
         SizedBox(height: MARGIN_XLARGE),
         LabelAndTextFieldView(
@@ -98,6 +99,7 @@ class SignUpSectionView extends StatelessWidget {
             SignUpBloc bloc = Provider.of<SignUpBloc>(context, listen: false);
             bloc.onEmailChanged(email);
           },
+          textEditingController: TextEditingController(),
         ),
         SizedBox(height: MARGIN_XLARGE),
         LabelAndTextFieldView(
@@ -109,6 +111,7 @@ class SignUpSectionView extends StatelessWidget {
             SignUpBloc bloc = Provider.of<SignUpBloc>(context, listen: false);
             bloc.onPasswordChanged(password);
           },
+          textEditingController: TextEditingController(),
         ),
         SizedBox(height: MARGIN_XLARGE),
         MaterialButton(

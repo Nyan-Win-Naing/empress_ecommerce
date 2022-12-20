@@ -42,7 +42,7 @@ class ItemVO {
 
   @JsonKey(name: "rating")
   @HiveField(8)
-  int? rating;
+  double? rating;
 
   @JsonKey(name: "category")
   @HiveField(9)

@@ -12,7 +12,7 @@ class ItemListResponse {
   int? countItems;
 
   @JsonKey(name: "page")
-  int? page;
+  String? page;
 
   @JsonKey(name: "pages")
   int? pages;

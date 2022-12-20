@@ -25,7 +25,7 @@ class ItemVOAdapter extends TypeAdapter<ItemVO> {
       operatingSystem: fields[5] as String?,
       graphicCard: fields[6] as String?,
       description: fields[7] as String?,
-      rating: fields[8] as int?,
+      rating: fields[8] as double?,
       category: fields[9] as String?,
       image: fields[10] as String?,
       images: (fields[11] as List?)?.cast<String>(),
@@ -104,7 +104,7 @@ ItemVO _$ItemVOFromJson(Map<String, dynamic> json) => ItemVO(
       operatingSystem: json['operatingSystem'] as String?,
       graphicCard: json['graphicCard'] as String?,
       description: json['description'] as String?,
-      rating: json['rating'] as int?,
+      rating: (json['rating'] as num?)?.toDouble(),
       category: json['category'] as String?,
       image: json['image'] as String?,
       images:

@@ -19,20 +19,20 @@ class HomePage extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: Colors.white,
           centerTitle: true,
-          title: Text(
+          title: const Text(
             "Empress",
             style: TextStyle(
               color: Colors.black,
               fontWeight: FontWeight.w700,
             ),
           ),
-          leading: Icon(
+          leading: const Icon(
             Icons.menu,
             color: Colors.black,
           ),
-          actions: [
+          actions: const [
             Padding(
-              padding: const EdgeInsets.only(right: MARGIN_MEDIUM),
+              padding: EdgeInsets.only(right: MARGIN_MEDIUM),
               child: Icon(
                 Icons.search,
                 color: Colors.black,
