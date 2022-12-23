@@ -1,73 +1,100 @@
+import 'package:empress_ecommerce_app/blocs/order_confirm_bloc.dart';
+import 'package:empress_ecommerce_app/data/vos/item_vo.dart';
+import 'package:empress_ecommerce_app/data/vos/order/order_vo.dart';
+import 'package:empress_ecommerce_app/pages/empress_app.dart';
 import 'package:empress_ecommerce_app/resources/colors.dart';
 import 'package:empress_ecommerce_app/resources/dimens.dart';
+import 'package:empress_ecommerce_app/utils/navigate_to_page.dart';
 import 'package:empress_ecommerce_app/widgets/order_delivery_section_view.dart';
 import 'package:empress_ecommerce_app/widgets/order_payment_section_view.dart';
 import 'package:empress_ecommerce_app/widgets/ordered_fees_section_view.dart';
 import 'package:empress_ecommerce_app/widgets/ordered_item_section_view.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class OrderConfirmPage extends StatelessWidget {
+  final OrderVO? orderVo;
+
+  OrderConfirmPage({required this.orderVo});
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        title: Text(
-          "Order Confirm",
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w700,
+    return ChangeNotifierProvider(
+      create: (context) => OrderConfirmBloc(orderVo?.orderItems ?? []),
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          centerTitle: true,
+          title: Text(
+            "Order Confirm",
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          leading: GestureDetector(
+            onTap: () {
+              navigateToNextPage(context, EmpressApp());
+            },
+            child: Icon(
+              Icons.arrow_back_ios,
+              color: Colors.black,
+            ),
           ),
         ),
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Icon(
-            Icons.arrow_back_ios,
-            color: Colors.black,
-          ),
-        ),
-      ),
-      body: Container(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(height: MARGIN_LARGE),
-              OrderConfirmImageSectionView(),
-              SizedBox(height: MARGIN_MEDIUM_3),
-              InvoiceNumberSectionView(),
-              SizedBox(height: MARGIN_XLARGE),
-              Padding(
-                padding:
+        body: Container(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(height: MARGIN_LARGE),
+                OrderConfirmImageSectionView(),
+                SizedBox(height: MARGIN_MEDIUM_3),
+                InvoiceNumberSectionView(
+                  invoiceNumber: orderVo?.id ?? "",
+                ),
+                SizedBox(height: MARGIN_XLARGE),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
+                  child: OrderedFeesSectionView(
+                    totalItemsPrice: orderVo?.itemsPrice ?? 0,
+                    deliveryFee: orderVo?.deliveryPrice ?? 0,
+                    taxFee: orderVo?.taxPrice ?? 0,
+                    totalPayment: orderVo?.totalPrice ?? 0,
+                  ),
+                ),
+                SizedBox(height: MARGIN_MEDIUM_2),
+                Selector<OrderConfirmBloc, List<ItemVO>>(
+                  selector: (context, bloc) => bloc.mItemList ?? [],
+                  builder: (context, itemList, child) => Padding(
+                    padding:
                     const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
-                child: OrderedFeesSectionView(),
-              ),
-              SizedBox(height: MARGIN_MEDIUM_2),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
-                child: OrderedItemsSectionView(),
-              ),
-              SizedBox(height: MARGIN_LARGE),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
-                child: OrderPaymentSectionView(),
-              ),
-              SizedBox(height: MARGIN_LARGE),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
-                child: OrderDeliverySectionView(),
-              ),
-              SizedBox(height: MARGIN_LARGE),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
-                child: PurchaseSectionView(),
-              ),
-              SizedBox(height: MARGIN_XLARGE),
-            ],
+                    child: OrderedItemsSectionView(cartItems: itemList),
+                  ),
+                ),
+                SizedBox(height: MARGIN_LARGE),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
+                  child: OrderPaymentSectionView(
+                      paymentMethod: orderVo?.paymentMethod ?? ""),
+                ),
+                SizedBox(height: MARGIN_LARGE),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
+                  child: OrderDeliverySectionView(
+                    name: orderVo?.deliveryAddress?.fullName ?? "",
+                    address: orderVo?.deliveryAddress?.address ?? "",
+                  ),
+                ),
+                SizedBox(height: MARGIN_LARGE),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
+                  child: PurchaseSectionView(),
+                ),
+                SizedBox(height: MARGIN_XLARGE),
+              ],
+            ),
           ),
         ),
       ),
@@ -87,8 +114,7 @@ class PurchaseSectionView extends StatelessWidget {
         PurchaseButtonView(label: "", image: "assets/paypal.png"),
         SizedBox(height: MARGIN_MEDIUM_2),
         PurchaseButtonView(
-            label: "Pay Later",
-            image: "assets/paypal_logo_trans.png"),
+            label: "Pay Later", image: "assets/paypal_logo_trans.png"),
         SizedBox(height: MARGIN_MEDIUM_2),
         PurchaseButtonView(
           label: "Debit or Credit Card",
@@ -119,7 +145,9 @@ class PurchaseButtonView extends StatelessWidget {
       onPressed: () {},
       minWidth: double.infinity,
       height: MARGIN_XXLARGE,
-      color: isCreditCard ? DEBIT_BUTTON_BACKGROUND_COLOR : PAYPAL_BUTTON_BACKGROUND_COLOR,
+      color: isCreditCard
+          ? DEBIT_BUTTON_BACKGROUND_COLOR
+          : PAYPAL_BUTTON_BACKGROUND_COLOR,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -149,16 +177,16 @@ class PurchaseButtonView extends StatelessWidget {
 }
 
 class InvoiceNumberSectionView extends StatelessWidget {
-  const InvoiceNumberSectionView({
-    Key? key,
-  }) : super(key: key);
+  final String invoiceNumber;
+
+  InvoiceNumberSectionView({required this.invoiceNumber});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
       child: Text(
-        "Invoice Number: 6393eea5ced5aef3ade641c7",
+        "Invoice Number: $invoiceNumber",
         textAlign: TextAlign.center,
         style: TextStyle(
           fontWeight: FontWeight.w700,

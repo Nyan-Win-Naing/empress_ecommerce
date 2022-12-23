@@ -24,6 +24,10 @@ class HomeBloc extends ChangeNotifier {
     });
   }
 
+  Future<void> onTapAddToCart(ItemVO? item) {
+    return mItemModel.addItemToCart(item);
+  }
+
   @override
   void dispose() {
     _disposed = true;

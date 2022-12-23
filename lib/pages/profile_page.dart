@@ -35,15 +35,7 @@ class ProfilePage extends StatelessWidget {
                   onTap: () {
                     ProfileBloc bloc =
                         Provider.of<ProfileBloc>(context, listen: false);
-                    bloc.onTapLogout().then((value) {
-                      _navigateToLoginPage(context);
-                    }).catchError((error) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("Log out fail !"),
-                        ),
-                      );
-                    });
+                    showConfirmDialogForLogout(context, bloc);
                   },
                   child: Icon(
                     Icons.logout,
@@ -79,6 +71,83 @@ class ProfilePage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  void showConfirmDialogForLogout(BuildContext context, ProfileBloc bloc) {
+    Widget logoutButton = TextButton(
+      style: TextButton.styleFrom(
+        backgroundColor: Colors.blue,
+      ),
+      onPressed: () {
+        bloc.onTapLogout().then((value) {
+          _navigateToLoginPage(context);
+        }).catchError((error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Log out fail !"),
+            ),
+          );
+        });
+      },
+      child: Text(
+        "Log Out",
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+
+    Widget cancelButton = TextButton(
+      style: TextButton.styleFrom(
+        backgroundColor: BOTTOM_SHEET_ICON_COLOR,
+      ),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+      child: Text(
+        "Cancel",
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+
+    AlertDialog alert = AlertDialog(
+      contentPadding: EdgeInsets.symmetric(
+          horizontal: MARGIN_CARD_MEDIUM_2, vertical: MARGIN_MEDIUM_2),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Image.asset(
+            "assets/logout_image.png",
+            height: 100,
+          ),
+          SizedBox(height: MARGIN_MEDIUM_2),
+          Text(
+            "Are you sure to logout ?",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: ORDER_BUTTON_COLOR,
+              fontSize: TEXT_REGULAR_2X,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        cancelButton,
+        logoutButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return alert;
+      },
     );
   }
 

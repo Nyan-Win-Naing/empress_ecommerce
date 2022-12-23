@@ -3,8 +3,11 @@ import 'package:empress_ecommerce_app/blocs/shop_bloc.dart';
 import 'package:empress_ecommerce_app/data/vos/category_vo.dart';
 import 'package:empress_ecommerce_app/data/vos/item_vo.dart';
 import 'package:empress_ecommerce_app/pages/product_detail_page.dart';
+import 'package:empress_ecommerce_app/pages/search_page.dart';
 import 'package:empress_ecommerce_app/resources/colors.dart';
 import 'package:empress_ecommerce_app/resources/dimens.dart';
+import 'package:empress_ecommerce_app/utils/navigate_to_page.dart';
+import 'package:empress_ecommerce_app/utils/show_snack_bar.dart';
 import 'package:empress_ecommerce_app/viewitems/category_chip_view.dart';
 import 'package:empress_ecommerce_app/viewitems/product_view_for_grid.dart';
 import 'package:empress_ecommerce_app/viewitems/product_view_for_vertical.dart';
@@ -36,9 +39,14 @@ class _ShopPageState extends State<ShopPage> {
           actions: [
             Padding(
               padding: EdgeInsets.only(right: MARGIN_MEDIUM),
-              child: Icon(
-                Icons.search,
-                color: Colors.black,
+              child: GestureDetector(
+                onTap: () {
+                  navigateToNextPage(context, SearchPage());
+                },
+                child: Icon(
+                  Icons.search,
+                  color: Colors.black,
+                ),
               ),
             ),
           ],
@@ -51,6 +59,7 @@ class _ShopPageState extends State<ShopPage> {
                   SnackBar(
                     behavior: SnackBarBehavior.floating,
                     content: Text("Loading Data"),
+                    duration: Duration(milliseconds: 200),
                   ),
                 );
                 ShopBloc bloc = Provider.of<ShopBloc>(context, listen: false);
@@ -160,13 +169,135 @@ class ProductListSectionView extends StatelessWidget {
         ),
         SizedBox(height: MARGIN_XLARGE),
         (view == "listView")
-            ? VerticalProductListView(itemList: itemList)
+            ? VerticalProductListView(
+                itemList: itemList,
+              )
             : (view == "3xGrid")
                 ? Grid3xProductListView(itemList: itemList)
                 : Grid2xProductListView(itemList: itemList),
         // VerticalProductListView(),
         // Grid3xProductListView(),
         // Grid2xProductListView(),
+      ],
+    );
+  }
+}
+
+void showProductBottomSheet(BuildContext context, ItemVO? itemVo, ShopBloc bloc) {
+  showModalBottomSheet(
+    context: context,
+    builder: (context) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding:
+            const EdgeInsets.symmetric(vertical: MARGIN_CARD_MEDIUM_2),
+            child: HeaderSectionBottomSheet(itemVo: itemVo),
+          ),
+          Divider(
+            color: Color.fromRGBO(0, 0, 0, 0.2),
+          ),
+          BottomSheetListTileView(
+            iconData: Icons.info_outline,
+            title: "View Detail",
+            onTap: () {
+              Navigator.pop(context);
+              navigateToNextPage(context, ProductDetailPage(itemId: itemVo?.id ?? ""));
+            },
+          ),
+          BottomSheetListTileView(
+            iconData: Icons.add_shopping_cart,
+            title: "Add To Cart",
+            onTap: () {
+              bloc.onTapAddToCart(itemVo).then((value) {
+                Navigator.pop(context);
+                showSnackBarWithMessage(context, "Added to cart!");
+              });
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+class BottomSheetListTileView extends StatelessWidget {
+  final IconData iconData;
+  final String title;
+  final Function onTap;
+
+  BottomSheetListTileView(
+      {required this.iconData, required this.title, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Icon(
+        iconData,
+        color: Colors.black,
+      ),
+      title: Transform.translate(
+        offset: Offset(-16, 0),
+        child: Text(
+          title,
+          style: TextStyle(
+            color: Color.fromRGBO(0, 0, 0, 0.7),
+            fontSize: TEXT_REGULAR,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+      onTap: () {
+        onTap();
+      },
+    );
+  }
+}
+
+class HeaderSectionBottomSheet extends StatelessWidget {
+  final ItemVO? itemVo;
+
+  HeaderSectionBottomSheet({required this.itemVo});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          margin: EdgeInsets.only(left: MARGIN_MEDIUM),
+          child: Image.network(
+            itemVo?.image ??
+                "https://media.istockphoto.com/id/1147544807/vector/thumbnail-image-vector-graphic.jpg?s=612x612&w=0&k=20&c=rnCKVbdxqkjlcs3xH87-9gocETqpspHFXu5dIGB4wuM=",
+            width: 80,
+          ),
+        ),
+        SizedBox(width: MARGIN_CARD_MEDIUM_2),
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              itemVo?.name ?? "",
+              style: TextStyle(
+                fontSize: TEXT_REGULAR_2X,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            SizedBox(height: MARGIN_SMALL),
+            Text(
+              itemVo?.brand ?? "",
+            ),
+            SizedBox(height: MARGIN_SMALL),
+            Text(
+              "\$ ${itemVo?.price}",
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: TEXT_REGULAR_2X,
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }
@@ -195,6 +326,10 @@ class Grid3xProductListView extends StatelessWidget {
           },
           child: ProductViewForGrid(
             item: itemList[index],
+            onTapMore: () {
+              ShopBloc bloc = Provider.of(context, listen: false);
+              showProductBottomSheet(context, itemList[index], bloc);
+            },
           ),
         );
       },
@@ -226,6 +361,10 @@ class Grid2xProductListView extends StatelessWidget {
           child: ProductViewForGrid(
             is3xGrid: false,
             item: itemList[index],
+            onTapMore: () {
+              ShopBloc bloc = Provider.of(context, listen: false);
+              showProductBottomSheet(context, itemList[index], bloc);
+            },
           ),
         );
       },
@@ -252,6 +391,10 @@ class VerticalProductListView extends StatelessWidget {
           },
           child: ProductViewForVertical(
             item: itemList[index],
+            onTapMore: () {
+              ShopBloc bloc = Provider.of(context, listen: false);
+              showProductBottomSheet(context, itemList[index], bloc);
+            },
           ),
         );
       },

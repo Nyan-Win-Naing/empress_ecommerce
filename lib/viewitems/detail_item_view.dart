@@ -1,10 +1,14 @@
+import 'package:empress_ecommerce_app/data/vos/order/order_item_vo.dart';
 import 'package:empress_ecommerce_app/resources/colors.dart';
 import 'package:empress_ecommerce_app/resources/dimens.dart';
 import 'package:empress_ecommerce_app/widgets/text_view.dart';
 import 'package:flutter/material.dart';
 
 class DetailItemView extends StatelessWidget {
-  const DetailItemView({Key? key}) : super(key: key);
+  final OrderItemVO? item;
+
+
+  DetailItemView({required this.item});
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +16,7 @@ class DetailItemView extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Image.network(
-          "https://res.cloudinary.com/dqscrfky2/image/upload/v1666593361/u5vmwuhm00kagvkarmme.png",
+          item?.image ?? "https://media.istockphoto.com/id/1147544807/vector/thumbnail-image-vector-graphic.jpg?s=612x612&w=0&k=20&c=rnCKVbdxqkjlcs3xH87-9gocETqpspHFXu5dIGB4wuM=",
           width: 120,
         ),
         Container(
@@ -21,19 +25,19 @@ class DetailItemView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextView(
-                data: "Logitech G240",
+                data: item?.name ?? "",
                 fontSize: TEXT_REGULAR_2X,
                 fontWeight: FontWeight.w700,
               ),
               SizedBox(height: MARGIN_MEDIUM),
               TextView(
-                data: "\$19.99",
+                data: "\$${item?.price}",
                 fontWeight: FontWeight.w700,
                 fontSize: TEXT_REGULAR_2X,
               ),
               SizedBox(height: MARGIN_MEDIUM),
               TextView(
-                data: "x3",
+                data: "x${item?.quantity}",
                 fontWeight: FontWeight.w700,
                 fontSize: TEXT_REGULAR_2X,
                 color: SECONDARY_DARK_COLOR,

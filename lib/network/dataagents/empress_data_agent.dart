@@ -1,5 +1,6 @@
 import 'package:empress_ecommerce_app/data/vos/item_vo.dart';
 import 'package:empress_ecommerce_app/data/vos/login_request_vo.dart';
+import 'package:empress_ecommerce_app/data/vos/order/order_vo.dart';
 import 'package:empress_ecommerce_app/data/vos/review_request_vo.dart';
 import 'package:empress_ecommerce_app/data/vos/review_vo.dart';
 import 'package:empress_ecommerce_app/data/vos/sign_up_request_vo.dart';
@@ -22,4 +23,10 @@ abstract class EmpressDataAgent {
     required String? category,
     required String rating,
   });
+  Future<List<ItemVO>?> getSearchedItems({
+    required int page,
+    required String query,
+  });
+  Future<OrderVO?> postNewOrder(String token, OrderVO orderRequest);
+  Future<List<OrderVO>?> getClientOrders(String token);
 }

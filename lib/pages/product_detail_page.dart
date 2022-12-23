@@ -3,8 +3,11 @@ import 'package:empress_ecommerce_app/blocs/product_detail_bloc.dart';
 import 'package:empress_ecommerce_app/data/vos/item_vo.dart';
 import 'package:empress_ecommerce_app/data/vos/review_vo.dart';
 import 'package:empress_ecommerce_app/dummy/dummy_list.dart';
+import 'package:empress_ecommerce_app/pages/empress_app.dart';
 import 'package:empress_ecommerce_app/resources/colors.dart';
 import 'package:empress_ecommerce_app/resources/dimens.dart';
+import 'package:empress_ecommerce_app/utils/navigate_to_page.dart';
+import 'package:empress_ecommerce_app/utils/show_snack_bar.dart';
 import 'package:empress_ecommerce_app/viewitems/customer_review_view.dart';
 import 'package:empress_ecommerce_app/widgets/add_to_cart_button_view.dart';
 import 'package:empress_ecommerce_app/widgets/product_list_title_view.dart';
@@ -31,7 +34,7 @@ class ProductDetailPage extends StatelessWidget {
             builder: (context, item, child) => Text(
               item?.name ?? "",
               style:
-              TextStyle(color: Colors.black, fontWeight: FontWeight.w700),
+                  TextStyle(color: Colors.black, fontWeight: FontWeight.w700),
             ),
           ),
           leading: GestureDetector(
@@ -46,9 +49,14 @@ class ProductDetailPage extends StatelessWidget {
           actions: [
             Padding(
               padding: const EdgeInsets.only(right: MARGIN_MEDIUM),
-              child: Icon(
-                Icons.add_shopping_cart,
-                color: Colors.black,
+              child: GestureDetector(
+                onTap: () {
+                  navigateToNextPage(context, EmpressApp(specificTab: 2));
+                },
+                child: Icon(
+                  Icons.add_shopping_cart,
+                  color: Colors.black,
+                ),
               ),
             ),
           ],
@@ -71,8 +79,20 @@ class ProductDetailPage extends StatelessWidget {
                   SizedBox(height: MARGIN_MEDIUM_2),
                   Padding(
                     padding:
-                    const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
-                    child: CartAndInStockSectionView(),
+                        const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
+                    child: CartAndInStockSectionView(
+                      onTap: () {
+                        ProductDetailBloc bloc = Provider.of<ProductDetailBloc>(
+                            context,
+                            listen: false);
+                        bloc.onTapAddToCart().then((value) {
+                          showSnackBarWithMessage(
+                              context, "Added product to cart!");
+                        }).catchError((error) {
+                          showSnackBarWithMessage(context, error.toString());
+                        });
+                      },
+                    ),
                   ),
                   SizedBox(height: MARGIN_MEDIUM_2),
                   AboutProductSectionView(
@@ -369,15 +389,19 @@ class ProductDescriptionView extends StatelessWidget {
 }
 
 class CartAndInStockSectionView extends StatelessWidget {
-  const CartAndInStockSectionView({
-    Key? key,
-  }) : super(key: key);
+  final Function onTap;
+
+  CartAndInStockSectionView({required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        AddToCartButtonView(),
+        AddToCartButtonView(
+          onTap: () {
+            onTap();
+          },
+        ),
         SizedBox(width: MARGIN_MEDIUM),
         Container(
           padding: EdgeInsets.symmetric(

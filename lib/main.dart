@@ -1,6 +1,9 @@
 import 'package:empress_ecommerce_app/data/models/user_model_impl.dart';
 import 'package:empress_ecommerce_app/data/vos/category_vo.dart';
 import 'package:empress_ecommerce_app/data/vos/item_vo.dart';
+import 'package:empress_ecommerce_app/data/vos/order/delivery_address_vo.dart';
+import 'package:empress_ecommerce_app/data/vos/order/order_item_vo.dart';
+import 'package:empress_ecommerce_app/data/vos/order/order_vo.dart';
 import 'package:empress_ecommerce_app/data/vos/review_vo.dart';
 import 'package:empress_ecommerce_app/data/vos/user_vo.dart';
 import 'package:empress_ecommerce_app/pages/empress_app.dart';
@@ -18,10 +21,15 @@ void main() async {
   Hive.registerAdapter(ItemVOAdapter());
   Hive.registerAdapter(ReviewVOAdapter());
   Hive.registerAdapter(CategoryVOAdapter());
+  Hive.registerAdapter(DeliveryAddressVOAdapter());
+  Hive.registerAdapter(OrderItemVOAdapter());
+  Hive.registerAdapter(OrderVOAdapter());
 
   await Hive.openBox<UserVO>(BOX_NAME_USER_VO);
   await Hive.openBox<ItemVO>(BOX_NAME_ITEM_VO);
   await Hive.openBox<CategoryVO>(BOX_NAME_CATEGORY_VO);
+  await Hive.openBox<ItemVO>(BOX_NAME_ITEM_VO_FOR_CART);
+  await Hive.openBox<OrderVO>(BOX_NAME_ORDER_VO);
 
   runApp(MyApp());
 }

@@ -1,9 +1,17 @@
 import 'package:dotted_line/dotted_line.dart';
+import 'package:empress_ecommerce_app/data/vos/order/order_item_vo.dart';
+import 'package:empress_ecommerce_app/data/vos/order/order_vo.dart';
 import 'package:empress_ecommerce_app/resources/colors.dart';
 import 'package:empress_ecommerce_app/resources/dimens.dart';
 import 'package:flutter/material.dart';
 
 class OrderHistoryView extends StatelessWidget {
+
+  final OrderVO? orderVo;
+
+
+  OrderHistoryView({required this.orderVo});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -19,15 +27,15 @@ class OrderHistoryView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          DateView(),
+          DateView(date: orderVo?.getFormattedDate() ?? ""),
           SizedBox(height: MARGIN_MEDIUM_2),
           OrderHistoryTitleView(),
           SizedBox(height: MARGIN_MEDIUM_3),
-          OrderedItemListView(),
+          OrderedItemListView(itemList: orderVo?.orderItems ?? []),
           SizedBox(height: MARGIN_MEDIUM_2),
           DottedDivider(),
           SizedBox(height: MARGIN_MEDIUM_2),
-          PaymentSectionView(),
+          PaymentSectionView(orderVo: orderVo),
         ],
       ),
     );
@@ -35,14 +43,16 @@ class OrderHistoryView extends StatelessWidget {
 }
 
 class DateView extends StatelessWidget {
-  const DateView({
-    Key? key,
-  }) : super(key: key);
+
+  final String date;
+
+
+  DateView({required this.date});
 
   @override
   Widget build(BuildContext context) {
     return Text(
-      "2022-09-07",
+      date,
       style: TextStyle(
         fontWeight: FontWeight.w700,
         fontSize: TEXT_REGULAR_2X,
@@ -53,19 +63,21 @@ class DateView extends StatelessWidget {
 }
 
 class PaymentSectionView extends StatelessWidget {
-  const PaymentSectionView({
-    Key? key,
-  }) : super(key: key);
+
+  final OrderVO? orderVo;
+
+
+  PaymentSectionView({required this.orderVo});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        PriceView(label: "Delivery Fee", price: 29.97),
+        PriceView(label: "Delivery Fee", price: orderVo?.deliveryPrice ?? 0),
         SizedBox(height: MARGIN_MEDIUM),
-        PriceView(label: "Tax Fee", price: 0.06),
+        PriceView(label: "Tax Fee", price: orderVo?.taxPrice ?? 0),
         SizedBox(height: MARGIN_MEDIUM),
-        PriceView(label: "Total Payment", price: 32.53, isTotalPayment: true),
+        PriceView(label: "Total Payment", price: orderVo?.totalPrice ?? 0, isTotalPayment: true),
       ],
     );
   }
@@ -87,15 +99,15 @@ class PriceView extends StatelessWidget {
         Text(
           "$label:",
           style: TextStyle(
-            color: isTotalPayment ? Colors.black : SECONDARY_DARK_COLOR,
+            color: isTotalPayment ? ORDER_BUTTON_COLOR : SECONDARY_DARK_COLOR,
             fontSize: TEXT_15,
             fontWeight: isTotalPayment ? FontWeight.w600 : FontWeight.w500,
           ),
         ),
         Text(
-          "\$$price",
+          "\$ ${price.toStringAsFixed(2)}",
           style: TextStyle(
-            color: isTotalPayment ? Colors.black : SECONDARY_DARK_COLOR,
+            color: isTotalPayment ? ORDER_BUTTON_COLOR : SECONDARY_DARK_COLOR,
             fontWeight: isTotalPayment ? FontWeight.w600 : FontWeight.w500,
           ),
         ),
@@ -118,41 +130,44 @@ class DottedDivider extends StatelessWidget {
 }
 
 class OrderedItemListView extends StatelessWidget {
-  const OrderedItemListView({
-    Key? key,
-  }) : super(key: key);
+
+  final List<OrderItemVO> itemList;
+
+
+  OrderedItemListView({required this.itemList});
 
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
-      itemCount: 3,
+      itemCount: itemList.length,
       itemBuilder: (context, index) {
-        return EachOrderItemView();
+        return EachOrderItemView(orderItemVo: itemList[index]);
       },
       separatorBuilder: (context, index) {
-        return SizedBox(height: MARGIN_MEDIUM);
+        return SizedBox(height: MARGIN_MEDIUM_2);
       },
     );
   }
 }
 
 class EachOrderItemView extends StatelessWidget {
-  const EachOrderItemView({
-    Key? key,
-  }) : super(key: key);
+  final OrderItemVO? orderItemVo;
+
+
+  EachOrderItemView({required this.orderItemVo});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        ItemColumnView(title: "Logitech G240", width: 1),
+        ItemColumnView(title: orderItemVo?.name ?? "", width: 1),
         SizedBox(width: MARGIN_SMALL),
-        ItemColumnView(title: "3x", width: 0.5, isQty: true),
+        ItemColumnView(title: "${orderItemVo?.quantity}x", width: 0.5, isQty: true),
         SizedBox(width: MARGIN_SMALL),
-        ItemColumnView(title: "\$29.97", width: 0.8, isPrice: true),
+        ItemColumnView(title: "\$ ${orderItemVo?.getItemPrice()}", width: 0.8, isPrice: true),
       ],
     );
   }

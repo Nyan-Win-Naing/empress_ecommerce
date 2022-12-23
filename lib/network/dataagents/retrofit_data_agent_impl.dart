@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:empress_ecommerce_app/data/vos/item_vo.dart';
 import 'package:empress_ecommerce_app/data/vos/login_request_vo.dart';
+import 'package:empress_ecommerce_app/data/vos/order/order_vo.dart';
 import 'package:empress_ecommerce_app/data/vos/review_request_vo.dart';
 import 'package:empress_ecommerce_app/data/vos/review_vo.dart';
 import 'package:empress_ecommerce_app/data/vos/sign_up_request_vo.dart';
@@ -81,5 +82,31 @@ class RetrofitDataAgentImpl extends EmpressDataAgent {
         .asStream()
         .map((response) => response.items)
         .first;
+  }
+
+  @override
+  Future<List<ItemVO>?> getSearchedItems({
+    required int page,
+    required String query,
+  }) {
+    return mApi
+        .getSearchedItems(page.toString(), query)
+        .asStream()
+        .map((response) => response.items)
+        .first;
+  }
+
+  @override
+  Future<OrderVO?> postNewOrder(String token, OrderVO orderRequest) {
+    return mApi
+        .postNewOrder(token, orderRequest)
+        .asStream()
+        .map((response) => response.order)
+        .first;
+  }
+
+  @override
+  Future<List<OrderVO>?> getClientOrders(String token) {
+    return mApi.getClientOrders(token);
   }
 }

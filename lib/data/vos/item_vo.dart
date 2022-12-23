@@ -80,6 +80,9 @@ class ItemVO {
   @HiveField(17)
   int? v;
 
+  @HiveField(18)
+  int? itemCount;
+
   ItemVO({
     this.id,
     this.name,
@@ -99,14 +102,20 @@ class ItemVO {
     this.createdAt,
     this.updatedAt,
     this.v,
+    this.itemCount,
   });
 
   factory ItemVO.fromJson(Map<String, dynamic> json) => _$ItemVOFromJson(json);
 
   Map<String, dynamic> toJson() => _$ItemVOToJson(this);
 
+
   @override
   String toString() {
-    return 'ItemVO{name: $name}';
+    return 'ItemVO{name: $name, itemCount: $itemCount}';
+  }
+
+  double getAmount() {
+    return (itemCount ?? 0) * (price ?? 0);
   }
 }

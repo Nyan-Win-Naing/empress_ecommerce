@@ -35,13 +35,14 @@ class ItemVOAdapter extends TypeAdapter<ItemVO> {
       createdAt: fields[15] as String?,
       updatedAt: fields[16] as String?,
       v: fields[17] as int?,
+      itemCount: fields[18] as int?,
     );
   }
 
   @override
   void write(BinaryWriter writer, ItemVO obj) {
     writer
-      ..writeByte(18)
+      ..writeByte(19)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -77,7 +78,9 @@ class ItemVOAdapter extends TypeAdapter<ItemVO> {
       ..writeByte(16)
       ..write(obj.updatedAt)
       ..writeByte(17)
-      ..write(obj.v);
+      ..write(obj.v)
+      ..writeByte(18)
+      ..write(obj.itemCount);
   }
 
   @override
@@ -117,6 +120,7 @@ ItemVO _$ItemVOFromJson(Map<String, dynamic> json) => ItemVO(
       createdAt: json['createdAt'] as String?,
       updatedAt: json['updatedAt'] as String?,
       v: json['__v'] as int?,
+      itemCount: json['itemCount'] as int?,
     );
 
 Map<String, dynamic> _$ItemVOToJson(ItemVO instance) => <String, dynamic>{
@@ -138,4 +142,5 @@ Map<String, dynamic> _$ItemVOToJson(ItemVO instance) => <String, dynamic>{
       'createdAt': instance.createdAt,
       'updatedAt': instance.updatedAt,
       '__v': instance.v,
+      'itemCount': instance.itemCount,
     };

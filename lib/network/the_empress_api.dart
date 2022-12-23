@@ -1,12 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:empress_ecommerce_app/data/vos/item_vo.dart';
 import 'package:empress_ecommerce_app/data/vos/login_request_vo.dart';
+import 'package:empress_ecommerce_app/data/vos/order/order_vo.dart';
 import 'package:empress_ecommerce_app/data/vos/review_request_vo.dart';
 import 'package:empress_ecommerce_app/data/vos/sign_up_request_vo.dart';
 import 'package:empress_ecommerce_app/data/vos/update_profile_request.dart';
 import 'package:empress_ecommerce_app/data/vos/user_vo.dart';
 import 'package:empress_ecommerce_app/network/api_constants.dart';
 import 'package:empress_ecommerce_app/network/responses/item_list_response.dart';
+import 'package:empress_ecommerce_app/network/responses/new_order_response.dart';
 import 'package:empress_ecommerce_app/network/responses/post_review_response.dart';
 import 'package:retrofit/http.dart';
 
@@ -58,5 +60,22 @@ abstract class TheEmpressApi {
     @Query(PARAM_ORDER) String? order,
     @Query(PARAM_CATEGORY) String? category,
     @Query(PARAM_RATING) String rating,
+  );
+
+  @GET(ENDPOINT_GET_ALL_ITEMS)
+  Future<ItemListResponse> getSearchedItems(
+    @Query(PARAM_PAGE) String page,
+    @Query(PARAM_QUERY) String query,
+  );
+
+  @POST(ENDPOINT_POST_NEW_ORDER)
+  Future<NewOrderResponse> postNewOrder(
+    @Header("Authorization") String token,
+    @Body() OrderVO orderRequest,
+  );
+
+  @GET(ENDPOINT_GET_CLIENT_ORDERS)
+  Future<List<OrderVO>?> getClientOrders(
+    @Header("Authorization") String token,
   );
 }

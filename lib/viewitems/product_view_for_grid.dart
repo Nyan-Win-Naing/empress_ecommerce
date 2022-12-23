@@ -7,9 +7,10 @@ class ProductViewForGrid extends StatelessWidget {
 
   final bool is3xGrid;
   final ItemVO? item;
+  final Function onTapMore;
 
 
-  ProductViewForGrid({this.is3xGrid = true, required this.item});
+  ProductViewForGrid({this.is3xGrid = true, required this.item, required this.onTapMore});
 
   @override
   Widget build(BuildContext context) {
@@ -34,9 +35,14 @@ class ProductViewForGrid extends StatelessWidget {
                 alignment: Alignment.bottomRight,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Icon(
-                    is3xGrid ? Icons.more_vert : Icons.more_horiz,
-                    size: MARGIN_MEDIUM_3,
+                  child: GestureDetector(
+                    onTap: () {
+                      onTapMore();
+                    },
+                    child: Icon(
+                      is3xGrid ? Icons.more_vert : Icons.more_horiz,
+                      size: MARGIN_MEDIUM_3,
+                    ),
                   ),
                 ),
               ),

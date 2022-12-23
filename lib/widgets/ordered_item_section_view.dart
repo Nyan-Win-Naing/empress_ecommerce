@@ -1,3 +1,4 @@
+import 'package:empress_ecommerce_app/data/vos/item_vo.dart';
 import 'package:empress_ecommerce_app/resources/colors.dart';
 import 'package:empress_ecommerce_app/resources/dimens.dart';
 import 'package:empress_ecommerce_app/viewitems/order_item_view.dart';
@@ -5,9 +6,10 @@ import 'package:empress_ecommerce_app/widgets/title_view_with_see_all.dart';
 import 'package:flutter/material.dart';
 
 class OrderedItemsSectionView extends StatefulWidget {
-  const OrderedItemsSectionView({
-    Key? key,
-  }) : super(key: key);
+  final List<ItemVO> cartItems;
+
+
+  OrderedItemsSectionView({required this.cartItems});
 
   @override
   State<OrderedItemsSectionView> createState() =>
@@ -45,9 +47,9 @@ class _OrderedItemsSectionViewState extends State<OrderedItemsSectionView> {
             child: ListView.separated(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
-              itemCount: 3,
+              itemCount: widget.cartItems.length,
               itemBuilder: (context, index) {
-                return OrderItemView();
+                return OrderItemView(itemVo: widget.cartItems[index]);
               },
               separatorBuilder: (BuildContext context, int index) {
                 return SizedBox(height: MARGIN_MEDIUM_3);

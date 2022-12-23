@@ -2,8 +2,10 @@ import 'package:dots_indicator/dots_indicator.dart';
 import 'package:empress_ecommerce_app/blocs/home_bloc.dart';
 import 'package:empress_ecommerce_app/data/vos/item_vo.dart';
 import 'package:empress_ecommerce_app/dummy/dummy_list.dart';
+import 'package:empress_ecommerce_app/pages/search_page.dart';
 import 'package:empress_ecommerce_app/resources/colors.dart';
 import 'package:empress_ecommerce_app/resources/dimens.dart';
+import 'package:empress_ecommerce_app/utils/navigate_to_page.dart';
 import 'package:empress_ecommerce_app/viewitems/banner_view.dart';
 import 'package:empress_ecommerce_app/viewitems/product_view.dart';
 import 'package:empress_ecommerce_app/widgets/product_list_title_view.dart';
@@ -30,12 +32,17 @@ class HomePage extends StatelessWidget {
             Icons.menu,
             color: Colors.black,
           ),
-          actions: const [
+          actions: [
             Padding(
               padding: EdgeInsets.only(right: MARGIN_MEDIUM),
-              child: Icon(
-                Icons.search,
-                color: Colors.black,
+              child: GestureDetector(
+                onTap: () {
+                  navigateToNextPage(context, SearchPage());
+                },
+                child: Icon(
+                  Icons.search,
+                  color: Colors.black,
+                ),
               ),
             ),
           ],
@@ -91,9 +98,7 @@ class TitleAndHorizontalProductsSectionView extends StatelessWidget {
 }
 
 class HorizontalProductListView extends StatelessWidget {
-
   final List<ItemVO> newArrivalItems;
-
 
   HorizontalProductListView({required this.newArrivalItems});
 

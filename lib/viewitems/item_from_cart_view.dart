@@ -1,22 +1,33 @@
+import 'package:empress_ecommerce_app/blocs/cart_bloc.dart';
+import 'package:empress_ecommerce_app/data/vos/item_vo.dart';
 import 'package:empress_ecommerce_app/resources/colors.dart';
 import 'package:empress_ecommerce_app/resources/dimens.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ItemFromCartView extends StatelessWidget {
+  final ItemVO? itemVo;
+
+  ItemFromCartView({required this.itemVo});
+
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        ProductImageView(),
-        ProductNameAndDetailView(),
+        ProductImageView(imageUrl: itemVo?.image ?? ""),
+        ProductNameAndDetailView(itemVo: itemVo),
       ],
     );
   }
 }
 
 class ProductNameAndDetailView extends StatelessWidget {
+  final ItemVO? itemVo;
+
+  ProductNameAndDetailView({required this.itemVo});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -24,18 +35,24 @@ class ProductNameAndDetailView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ProductNameView(),
+          ProductNameView(productName: itemVo?.name ?? ""),
           SizedBox(height: MARGIN_MEDIUM_2),
           Row(
             children: [
-              IncrementDecrementView(operator: "-"),
+              IncrementDecrementView(
+                operator: "-",
+                onTap: () {
+                  CartBloc bloc = Provider.of<CartBloc>(context, listen: false);
+                  bloc.onTapMinus(itemVo);
+                },
+              ),
               SizedBox(width: MARGIN_MEDIUM),
               Container(
                 width: 40,
                 // color: Colors.blueAccent,
                 child: Center(
                   child: Text(
-                    "3",
+                    "${itemVo?.itemCount}",
                     style: TextStyle(
                       color: SECONDARY_DARK_COLOR,
                       fontSize: TEXT_REGULAR_2X,
@@ -45,7 +62,13 @@ class ProductNameAndDetailView extends StatelessWidget {
                 ),
               ),
               SizedBox(width: MARGIN_MEDIUM),
-              IncrementDecrementView(operator: "+"),
+              IncrementDecrementView(
+                operator: "+",
+                onTap: () {
+                  CartBloc bloc = Provider.of(context, listen: false);
+                  bloc.onTapAdd(itemVo);
+                },
+              ),
             ],
           ),
           SizedBox(height: MARGIN_MEDIUM_2),
@@ -55,7 +78,7 @@ class ProductNameAndDetailView extends StatelessWidget {
                 width: 90,
                 // color: Colors.blueAccent,
                 child: Text(
-                  "\$ 19.87",
+                  "\$ ${itemVo?.price}",
                   style: TextStyle(
                     color: ORDER_BUTTON_COLOR,
                     fontSize: TEXT_REGULAR_2X,
@@ -63,9 +86,15 @@ class ProductNameAndDetailView extends StatelessWidget {
                   ),
                 ),
               ),
-              Icon(
-                Icons.delete_forever,
-                color: Colors.redAccent,
+              GestureDetector(
+                onTap: () {
+                  CartBloc bloc = Provider.of<CartBloc>(context, listen: false);
+                  bloc.onTapDelete(itemVo);
+                },
+                child: Icon(
+                  Icons.delete_forever,
+                  color: Colors.redAccent,
+                ),
               ),
             ],
           ),
@@ -77,25 +106,31 @@ class ProductNameAndDetailView extends StatelessWidget {
 
 class IncrementDecrementView extends StatelessWidget {
   final String operator;
+  final Function onTap;
 
-  IncrementDecrementView({required this.operator});
+  IncrementDecrementView({required this.operator, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 30,
-      height: 30,
-      decoration: BoxDecoration(
-        color: (operator == "-") ? BOTTOM_SHEET_ICON_COLOR : Colors.blue,
-        borderRadius: BorderRadius.circular(MARGIN_MEDIUM),
-      ),
-      child: Center(
-        child: Text(
-          operator,
-          style: TextStyle(
-            fontSize: TEXT_REGULAR_3X,
-            color: Colors.white,
-            fontWeight: FontWeight.w700,
+    return GestureDetector(
+      onTap: () {
+        onTap();
+      },
+      child: Container(
+        width: 30,
+        height: 30,
+        decoration: BoxDecoration(
+          color: (operator == "-") ? BOTTOM_SHEET_ICON_COLOR : Colors.blue,
+          borderRadius: BorderRadius.circular(MARGIN_MEDIUM),
+        ),
+        child: Center(
+          child: Text(
+            operator,
+            style: TextStyle(
+              fontSize: TEXT_REGULAR_3X,
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       ),
@@ -104,14 +139,14 @@ class IncrementDecrementView extends StatelessWidget {
 }
 
 class ProductNameView extends StatelessWidget {
-  const ProductNameView({
-    Key? key,
-  }) : super(key: key);
+  final String productName;
+
+  ProductNameView({required this.productName});
 
   @override
   Widget build(BuildContext context) {
     return Text(
-      "Razer Mouse",
+      productName,
       style: TextStyle(
         fontSize: TEXT_REGULAR_2X,
         fontWeight: FontWeight.w700,
@@ -121,14 +156,16 @@ class ProductNameView extends StatelessWidget {
 }
 
 class ProductImageView extends StatelessWidget {
-  const ProductImageView({
-    Key? key,
-  }) : super(key: key);
+  final String imageUrl;
+
+  ProductImageView({required this.imageUrl});
 
   @override
   Widget build(BuildContext context) {
     return Image.network(
-      "https://res.cloudinary.com/dqscrfky2/image/upload/v1666455051/auodcxmsfaf3scpkdblk.png",
+      (imageUrl.isNotEmpty)
+          ? imageUrl
+          : "https://joadre.com/wp-content/uploads/2019/02/no-image.jpg",
       width: 120,
     );
   }

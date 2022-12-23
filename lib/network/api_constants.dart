@@ -9,9 +9,12 @@ const String ENDPOINT_GET_ITEM_DETAIL = "/server/items/item";
 const String ENDPOINT_POST_REVIEW = "/reviews";
 const String ENDPOINT_PUT_UPDATE_PROFILE = "/server/user/profile";
 const String ENDPOINT_GET_ALL_CATEGORIES = "/server/items/categories";
+const String ENDPOINT_POST_NEW_ORDER = "/server/orders/new";
+const String ENDPOINT_GET_CLIENT_ORDERS = "/server/orders/client";
 
 /// Parameters
 const String PARAM_PAGE = "page";
 const String PARAM_ORDER = "order";
 const String PARAM_CATEGORY = "category";
 const String PARAM_RATING = "rating";
+const String PARAM_QUERY = "query";

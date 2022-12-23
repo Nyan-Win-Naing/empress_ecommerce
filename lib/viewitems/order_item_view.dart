@@ -1,15 +1,22 @@
+import 'package:empress_ecommerce_app/data/vos/item_vo.dart';
 import 'package:empress_ecommerce_app/resources/colors.dart';
 import 'package:empress_ecommerce_app/resources/dimens.dart';
 import 'package:flutter/material.dart';
 
 class OrderItemView extends StatelessWidget {
+
+  final ItemVO? itemVo;
+
+
+  OrderItemView({required this.itemVo});
+
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Image.network(
-          "https://res.cloudinary.com/dqscrfky2/image/upload/v1666455051/auodcxmsfaf3scpkdblk.png",
+          itemVo?.image ?? "https://joadre.com/wp-content/uploads/2019/02/no-image.jpg",
           width: 100,
         ),
         Container(
@@ -18,7 +25,7 @@ class OrderItemView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Razer Mouse",
+                itemVo?.name ?? "",
                 style: TextStyle(
                   fontSize: TEXT_REGULAR_2X,
                   fontWeight: FontWeight.bold,
@@ -26,7 +33,7 @@ class OrderItemView extends StatelessWidget {
               ),
               SizedBox(height: MARGIN_SMALL),
               Text(
-                "Total: 5",
+                "Total: ${itemVo?.itemCount}",
                 style: TextStyle(
                   color: SECONDARY_DARK_COLOR,
                   fontWeight: FontWeight.w600,
@@ -34,7 +41,7 @@ class OrderItemView extends StatelessWidget {
               ),
               SizedBox(height: MARGIN_SMALL),
               Text(
-                "\$ 19.87",
+                "\$ ${itemVo?.price}",
                 style: TextStyle(
                   color: SECONDARY_DARK_COLOR,
                   fontWeight: FontWeight.w600,

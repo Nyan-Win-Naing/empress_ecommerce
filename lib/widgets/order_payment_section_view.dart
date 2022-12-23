@@ -4,9 +4,11 @@ import 'package:empress_ecommerce_app/widgets/product_list_title_view.dart';
 import 'package:flutter/material.dart';
 
 class OrderPaymentSectionView extends StatelessWidget {
-  const OrderPaymentSectionView({
-    Key? key,
-  }) : super(key: key);
+
+  final String paymentMethod;
+
+
+  OrderPaymentSectionView({required this.paymentMethod});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +35,7 @@ class OrderPaymentSectionView extends StatelessWidget {
                 ),
               ),
               Text(
-                "Paypal",
+                (paymentMethod == "paypal") ? "Paypal" : "Stripe",
                 style: TextStyle(
                   color: SECONDARY_DARK_COLOR,
                   fontWeight: FontWeight.w600,

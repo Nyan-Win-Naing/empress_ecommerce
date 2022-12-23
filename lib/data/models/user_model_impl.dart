@@ -5,6 +5,8 @@ import 'package:empress_ecommerce_app/data/vos/update_profile_request.dart';
 import 'package:empress_ecommerce_app/data/vos/user_vo.dart';
 import 'package:empress_ecommerce_app/network/dataagents/empress_data_agent.dart';
 import 'package:empress_ecommerce_app/network/dataagents/retrofit_data_agent_impl.dart';
+import 'package:empress_ecommerce_app/persistence/daos/item_for_cart_dao.dart';
+import 'package:empress_ecommerce_app/persistence/daos/order_dao.dart';
 import 'package:empress_ecommerce_app/persistence/daos/user_dao.dart';
 import 'package:flutter/foundation.dart';
 import 'package:stream_transform/stream_transform.dart';
@@ -22,6 +24,8 @@ class UserModelImpl extends UserModel {
 
   /// Daos
   UserDao mUserDao = UserDao();
+  ItemForCartDao mCartDao = ItemForCartDao();
+  OrderDao mOrderDao = OrderDao();
 
   String getBearerToken() {
     String userToken = mUserDao.getAllUsers().first.token ?? "";
@@ -83,7 +87,9 @@ class UserModelImpl extends UserModel {
   }
 
   @override
-  Future<void> logout() {
+  Future<void> logout() async {
+    mCartDao.removeAllItemsFromDatabase();
+    mOrderDao.removeAllOrdersFromDatabase();
     return mUserDao.removeAllUsers();
   }
 }

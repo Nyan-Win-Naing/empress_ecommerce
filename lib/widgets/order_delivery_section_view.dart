@@ -4,7 +4,12 @@ import 'package:empress_ecommerce_app/widgets/product_list_title_view.dart';
 import 'package:flutter/material.dart';
 
 class OrderDeliverySectionView extends StatelessWidget {
-  const OrderDeliverySectionView({Key? key}) : super(key: key);
+
+  final String name;
+  final String address;
+
+
+  OrderDeliverySectionView({required this.name, required this.address});
 
   @override
   Widget build(BuildContext context) {
@@ -23,11 +28,11 @@ class OrderDeliverySectionView extends StatelessWidget {
           ),
           child: Column(
             children: [
-              AddressRowView(label: "Name:", value: "Maung Maung"),
+              AddressRowView(label: "Name:", value: name),
               SizedBox(height: MARGIN_MEDIUM_2),
               AddressRowView(
                   label: "Address:",
-                  value: "No 23 , Baw Ga road, Naung Cho, Shan State."),
+                  value: address),
             ],
           ),
         ),

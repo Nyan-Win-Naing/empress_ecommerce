@@ -1,4 +1,6 @@
 import 'package:dotted_line/dotted_line.dart';
+import 'package:empress_ecommerce_app/data/vos/order/order_item_vo.dart';
+import 'package:empress_ecommerce_app/data/vos/order/order_vo.dart';
 import 'package:empress_ecommerce_app/resources/colors.dart';
 import 'package:empress_ecommerce_app/resources/dimens.dart';
 import 'package:empress_ecommerce_app/viewitems/detail_item_view.dart';
@@ -8,6 +10,10 @@ import 'package:empress_ecommerce_app/widgets/text_view.dart';
 import 'package:flutter/material.dart';
 
 class OrderHistoryDetailPage extends StatelessWidget {
+  final OrderVO? orderVo;
+
+  OrderHistoryDetailPage({required this.orderVo});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,25 +42,29 @@ class OrderHistoryDetailPage extends StatelessWidget {
           child: Column(
             children: [
               SizedBox(height: MARGIN_MEDIUM_3),
-              OrderDetailListSectionView(),
+              OrderDetailListSectionView(itemList: orderVo?.orderItems ?? []),
               SizedBox(height: MARGIN_MEDIUM_3),
               DottedLineSectionView(),
               SizedBox(height: MARGIN_MEDIUM_3),
-              TotalSectionView(),
+              TotalSectionView(orderVo: orderVo),
               SizedBox(height: MARGIN_MEDIUM_3),
               DottedLineSectionView(),
               SizedBox(height: MARGIN_MEDIUM_3),
-              TotalPaymentSectionView(),
+              TotalPaymentSectionView(orderVo: orderVo),
               SizedBox(height: MARGIN_XLARGE),
               Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
-                child: OrderPaymentSectionView(),
+                child: OrderPaymentSectionView(
+                    paymentMethod: orderVo?.paymentMethod ?? ""),
               ),
               SizedBox(height: MARGIN_XLARGE),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
-                child: OrderDeliverySectionView(),
+                child: OrderDeliverySectionView(
+                  name: orderVo?.deliveryAddress?.fullName ?? "",
+                  address: orderVo?.deliveryAddress?.address ?? "",
+                ),
               ),
               SizedBox(height: MARGIN_LARGE),
             ],
@@ -66,9 +76,9 @@ class OrderHistoryDetailPage extends StatelessWidget {
 }
 
 class TotalPaymentSectionView extends StatelessWidget {
-  const TotalPaymentSectionView({
-    Key? key,
-  }) : super(key: key);
+  final OrderVO? orderVo;
+
+  TotalPaymentSectionView({required this.orderVo});
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +86,7 @@ class TotalPaymentSectionView extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
       child: PriceRowView(
         label: "Total Payment",
-        price: 32.53,
+        price: orderVo?.totalPrice ?? 0,
         isTotalPrice: true,
       ),
     );
@@ -84,9 +94,9 @@ class TotalPaymentSectionView extends StatelessWidget {
 }
 
 class TotalSectionView extends StatelessWidget {
-  const TotalSectionView({
-    Key? key,
-  }) : super(key: key);
+  final OrderVO? orderVo;
+
+  TotalSectionView({required this.orderVo});
 
   @override
   Widget build(BuildContext context) {
@@ -94,11 +104,12 @@ class TotalSectionView extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
       child: Column(
         children: [
-          PriceRowView(label: "Items Price", price: 29.97),
+          PriceRowView(label: "Items Price", price: orderVo?.itemsPrice ?? 0),
           SizedBox(height: MARGIN_MEDIUM),
-          PriceRowView(label: "Delivery Fee", price: 2.5),
+          PriceRowView(
+              label: "Delivery Fee", price: orderVo?.deliveryPrice ?? 0),
           SizedBox(height: MARGIN_MEDIUM),
-          PriceRowView(label: "Tax Fee", price: 0.06),
+          PriceRowView(label: "Tax Fee", price: orderVo?.taxPrice ?? 0),
         ],
       ),
     );
@@ -122,13 +133,13 @@ class PriceRowView extends StatelessWidget {
           data: "$label:",
           fontSize: TEXT_REGULAR_2X,
           fontWeight: FontWeight.w600,
-          color: isTotalPrice ? Colors.black : SECONDARY_DARK_COLOR,
+          color: isTotalPrice ? Colors.blue : SECONDARY_DARK_COLOR,
         ),
         TextView(
-          data: "\$$price",
+          data: "\$${price.toStringAsFixed(2)}",
           fontSize: TEXT_REGULAR_2X,
           fontWeight: FontWeight.w600,
-          color: isTotalPrice ? Colors.black : SECONDARY_DARK_COLOR,
+          color: isTotalPrice ? Colors.blue : SECONDARY_DARK_COLOR,
         ),
       ],
     );
@@ -150,9 +161,9 @@ class DottedLineSectionView extends StatelessWidget {
 }
 
 class OrderDetailListSectionView extends StatelessWidget {
-  const OrderDetailListSectionView({
-    Key? key,
-  }) : super(key: key);
+  final List<OrderItemVO> itemList;
+
+  OrderDetailListSectionView({required this.itemList});
 
   @override
   Widget build(BuildContext context) {
@@ -160,9 +171,9 @@ class OrderDetailListSectionView extends StatelessWidget {
       shrinkWrap: true,
       padding: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
       physics: NeverScrollableScrollPhysics(),
-      itemCount: 2,
+      itemCount: itemList.length,
       itemBuilder: (context, index) {
-        return DetailItemView();
+        return DetailItemView(item: itemList[index]);
       },
       separatorBuilder: (BuildContext context, int index) {
         return SizedBox(height: MARGIN_LARGE);

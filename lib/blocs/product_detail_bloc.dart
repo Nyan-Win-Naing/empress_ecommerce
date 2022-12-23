@@ -56,6 +56,10 @@ class ProductDetailBloc extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> onTapAddToCart() {
+    return mItemModel.addItemToCart(item);
+  }
+
   @override
   void dispose() {
     _disposed = true;

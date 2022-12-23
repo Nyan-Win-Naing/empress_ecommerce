@@ -5,13 +5,26 @@ import 'package:empress_ecommerce_app/pages/shop_page.dart';
 import 'package:flutter/material.dart';
 
 class EmpressApp extends StatefulWidget {
+
+  final int specificTab;
+
+
+  EmpressApp({this.specificTab = 0});
+
   @override
   State<EmpressApp> createState() => _EmpressAppState();
 }
 
 class _EmpressAppState extends State<EmpressApp> {
 
-  int _selectedIndex = 0;
+  late int _selectedIndex;
+
+
+  @override
+  void initState() {
+    _selectedIndex = widget.specificTab;
+    super.initState();
+  }
 
   List<Widget> _widgetOptions = [
     HomePage(),

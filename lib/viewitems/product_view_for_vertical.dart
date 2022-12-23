@@ -6,9 +6,10 @@ import 'package:flutter/material.dart';
 class ProductViewForVertical extends StatelessWidget {
 
   final ItemVO? item;
+  final Function onTapMore;
 
 
-  ProductViewForVertical({required this.item});
+  ProductViewForVertical({required this.item, required this.onTapMore});
 
   @override
   Widget build(BuildContext context) {
@@ -59,9 +60,14 @@ class ProductViewForVertical extends StatelessWidget {
               ],
             ),
           ),
-          Icon(
-            Icons.more_horiz,
-            color: SECONDARY_DARK_COLOR,
+          GestureDetector(
+            onTap: () {
+              onTapMore();
+            },
+            child: Icon(
+              Icons.more_horiz,
+              color: SECONDARY_DARK_COLOR,
+            ),
           ),
         ],
       ),

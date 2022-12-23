@@ -3,12 +3,19 @@ import 'package:flutter/material.dart';
 
 class AddToCartButtonView extends StatelessWidget {
 
+  final Function onTap;
+
+
+  AddToCartButtonView({required this.onTap});
+
   @override
   Widget build(BuildContext context) {
     return MaterialButton(
       color: Colors.blue,
       elevation: 0,
-      onPressed: () {},
+      onPressed: () {
+        onTap();
+      },
       child: Row(
         children: [
           Icon(
